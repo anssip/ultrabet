@@ -1,0 +1,143 @@
+scalar DateTime
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    password: String!
+    wallet: Wallet
+    bets: [Bet]
+}
+
+"""
+An Event represents a sports match or competition on which users can place bets.
+"""
+type Event {
+    id: ID!
+    """
+    Is this event currently live?
+    """
+    isLive: Boolean!
+    name: String!
+    startTime: String!
+    sport: String!
+    markets: [Market]
+}
+
+"""
+A Market represents a specific betting opportunity within an event.
+It's usually associated with one aspect of the event that users can bet on.
+A single event can have multiple markets. Some common examples of markets
+include Moneyline, Point Spread, and Totals (Over/Under).
+"""
+type Market {
+    id: ID!
+    """
+    Is this Market available for live betting?
+    """
+    isLive: Boolean!
+    """
+    When was this Market last updated? Used to track when the odds were last
+    updated during live betting.
+    """
+    lastUpdated: DateTime
+    name: String!
+    eventId: ID!
+    event: Event
+    options: [MarketOption]
+}
+
+"""
+A MarketOption represents a specific choice or outcome within a market
+that users can bet on. Each market typically has two or more options to choose from.
+"""
+type MarketOption {
+    id: ID!
+    """
+    When was this Market last updated? Used to track when the odds were last
+    updated during live betting.
+    """
+    lastUpdated: DateTime
+    name: String!
+    odds: Float!
+    marketId: ID!
+    market: Market
+}
+
+type Bet {
+    id: ID!
+    userId: ID!
+    user: User
+    marketOptionId: ID!
+    marketOption: MarketOption
+    stake: Float!
+    potentialWinnings: Float!
+    createdAt: String!
+    status: BetStatus!
+}
+
+type Wallet {
+    id: ID!
+    userId: ID!
+    user: User
+    balance: Float!
+    transactions: [Transaction]
+}
+
+type Transaction {
+    id: ID!
+    walletId: ID!
+    wallet: Wallet
+    amount: Float!
+    transactionType: TransactionType!
+    createdAt: String!
+}
+
+enum BetStatus {
+    PENDING
+    WON
+    LOST
+    CANCELED
+}
+
+enum TransactionType {
+    DEPOSIT
+    WITHDRAWAL
+    BET_PLACED
+    BET_WON
+    BET_REFUNDED
+}
+
+type Subscription {
+    liveEventUpdated(id: ID!): Event
+    liveMarketUpdated(id: ID!): Market
+    liveMarketOptionUpdated(id: ID!): MarketOption
+}
+
+# Queries
+
+type Query {
+    hello: String
+    getUser(id: ID!): User
+    getEvent(id: ID!): Event
+    listEvents: [Event]
+    getMarket(id: ID!): Market
+    listMarkets(eventId: ID!): [Market]
+    getBet(id: ID!): Bet
+    listBets(userId: ID!): [Bet]
+
+    listLiveEvents: [Event]
+    listLiveMarkets(eventId: ID!): [Market]
+}
+
+# Mutations
+
+type Mutation {
+    createUser(username: String!, email: String!, password: String!): User
+    createEvent(name: String!, startTime: String!, sport: String!): Event
+    createMarket(name: String!, eventId: ID!): Market
+    createMarketOption(name: String!, odds: Float!, marketId: ID!): MarketOption
+    placeBet(userId: ID!, marketOptionId: ID!, stake: Float!): Bet
+    depositFunds(userId: ID!, amount: Float!): Wallet
+    withdrawFunds(userId: ID!, amount: Float!): Wallet
+}

@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: springboot-graphql-example
+  datasource:
+    url: jdbc:mysql://localhost:3306/betting1
+    username: betadmin
+    password: asdf123_
+graphql:
+  path: /graphql
