@@ -1,8 +1,8 @@
 package com.npd.betting.model
 
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.sql.Timestamp
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -21,7 +21,10 @@ data class User(
     val password: String,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
-    val wallets: List<Wallet> = emptyList()
+    val wallets: List<Wallet> = emptyList(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
+    val bets: List<Bet> = emptyList()
 )
 
 @Entity
