@@ -20,8 +20,8 @@ data class User(
     @Column(name = "password", nullable = false)
     val password: String,
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
-    val wallets: List<Wallet> = emptyList(),
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
+    val wallet: Wallet,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     val bets: List<Bet> = emptyList()
@@ -34,7 +34,7 @@ data class Wallet(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     val user: User,
 

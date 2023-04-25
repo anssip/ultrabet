@@ -1,3 +1,7 @@
+-- Insert example wallet for user 1
+INSERT INTO wallets (user_id, balance)
+VALUES (1, 100.00);
+
 -- Insert example events
 INSERT INTO events (is_live, name, start_time, sport)
 VALUES (true, 'Premier League - Liverpool vs. Manchester United', '2023-05-01 20:00:00', 'Soccer'),
