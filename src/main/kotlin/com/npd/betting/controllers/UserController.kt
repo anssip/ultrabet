@@ -2,7 +2,6 @@ package com.npd.betting.controllers
 
 import com.npd.betting.model.Bet
 import com.npd.betting.model.User
-import com.npd.betting.model.Wallet
 import com.npd.betting.repositories.UserRepository
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,11 +18,6 @@ class UserController @Autowired constructor(
     @SchemaMapping(typeName = "Query", field = "getUser")
     fun getUser(@Argument id: Int): User {
         return userRepository.findById(id).orElse(null)
-    }
-
-    @SchemaMapping(typeName = "User", field = "wallet")
-    fun getWallet(user: User): Wallet {
-        return user.wallet
     }
 
     @SchemaMapping(typeName = "User", field = "bets")

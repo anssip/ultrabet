@@ -9,7 +9,3 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface UserRepository : JpaRepository<User, Int> {
     // Custom methods can be added here if needed
 }
-
-interface BetRepository : JpaRepository<User, Int> {
-    // Custom methods can be added here if needed
-}
