@@ -21,7 +21,7 @@ data class User(
     val password: String,
 
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
-    val wallet: Wallet,
+    var wallet: Wallet? = null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     val bets: List<Bet> = emptyList()
@@ -39,7 +39,7 @@ data class Wallet(
     val user: User,
 
     @Column(name = "balance", nullable = false)
-    val balance: BigDecimal,
+    var balance: BigDecimal,
 
     @OneToMany(mappedBy = "wallet", cascade = [CascadeType.ALL])
     val transactions: List<Transaction> = emptyList()
@@ -142,38 +142,74 @@ data class MarketOption(
     @JoinColumn(name = "market_id")
     val market: Market,
 
-    @OneToMany(mappedBy = "marketOption", cascade = [CascadeType.ALL])
-    val bets: List<Bet> = emptyList()
+    @OneToMany(mappedBy = "marketOption", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val betOptions: MutableList<BetOption> = mutableListOf()
 )
 
 @Entity
 @Table(name = "bets")
 data class Bet(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     val user: User,
-
-    @ManyToOne
-    @JoinColumn(name = "market_option_id")
-    val marketOption: MarketOption,
 
     @Column(name = "stake", nullable = false)
     val stake: BigDecimal,
 
-    @Column(name = "potential_winnings", nullable = false)
-    val potentialWinnings: BigDecimal,
-
-    @Column(name = "created_at", nullable = false)
-    val createdAt: Timestamp = Timestamp(System.currentTimeMillis()),
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    val status: BetStatus
+    @Enumerated(EnumType.STRING)
+    var status: BetStatus,
+
+    @OneToMany(mappedBy = "bet", cascade = [CascadeType.PERSIST], fetch = FetchType.EAGER)
+    var betOptions: MutableList<BetOption> = mutableListOf(),
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    val id: Int? = null,
+) {
+    constructor(user: User, stake: BigDecimal, status: BetStatus, marketOptions: List<MarketOption>) : this(
+        user,
+        stake,
+        status
+    ) {
+        this.betOptions = marketOptions.map { BetOption(this, it) }.toMutableList()
+    }
+
+    fun calculatePotentialWinnings(): BigDecimal {
+        return betOptions.fold(stake) { total, betOption ->
+            total * betOption.marketOption.odds
+        }
+    }
+
+    fun addMarketOption(marketOption: MarketOption): BetOption {
+        val betOption = BetOption(this, marketOption)
+        betOptions.add(betOption)
+        return betOption
+    }
+
+    fun getId(): Int {
+        return id ?: 0
+    }
+}
+
+@Entity
+@Table(name = "bet_options")
+data class BetOption(
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bet_id")
+    val bet: Bet,
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "market_option_id")
+    val marketOption: MarketOption,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int? = null,
 )
+
 
 enum class BetStatus {
     PENDING,

@@ -64,12 +64,18 @@ type MarketOption {
     market: Market
 }
 
+type BetOption {
+    id: Int!
+    bet: Bet!
+    marketOption: MarketOption!
+}
+
 type Bet {
     id: ID!
     userId: ID!
     user: User
     marketOptionId: ID!
-    marketOption: MarketOption
+    betOptions: [BetOption]
     stake: Float!
     potentialWinnings: Float!
     createdAt: String!
@@ -127,16 +133,23 @@ type Query {
 
     listLiveEvents: [Event]
     listLiveMarkets(eventId: ID!): [Market]
+
+    # TODO: admin queries, should use pagination
+    # listUsers: [User]
+    # listBets: [Bet]
 }
 
 # Mutations
 
 type Mutation {
     createUser(username: String!, email: String!, password: String!): User
+    placeBet(userId: ID!, marketOptions: [ID!]!, stake: Float!): Bet
+
+    depositFunds(userId: ID!, amount: Float!): Wallet
+    withdrawFunds(userId: ID!, amount: Float!): Wallet
+
+    # should be available for admins only:
     createEvent(name: String!, startTime: String!, sport: String!): Event
     createMarket(name: String!, eventId: ID!): Market
     createMarketOption(name: String!, odds: Float!, marketId: ID!): MarketOption
-    placeBet(userId: ID!, marketOptionId: ID!, stake: Float!): Bet
-    depositFunds(userId: ID!, amount: Float!): Wallet
-    withdrawFunds(userId: ID!, amount: Float!): Wallet
 }

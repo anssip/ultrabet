@@ -28,3 +28,5 @@ interface MarketRepository : JpaRepository<Market, Int> {
 interface MarketOptionRepository : JpaRepository<MarketOption, Int>
 
 interface TransactionRepository : JpaRepository<Transaction, Int>
+
+interface BetOptionRepository : JpaRepository<BetOption, Int>

@@ -6,8 +6,11 @@ import com.npd.betting.repositories.EventRepository
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.stereotype.Controller
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Controller
 class EventController @Autowired constructor(
@@ -38,5 +41,17 @@ class EventController @Autowired constructor(
         query.setParameter("id", event.id)
         val resultList = query.resultList
         return if (resultList.isEmpty()) emptyList() else resultList[0].markets
+    }
+
+    @MutationMapping
+    fun createEvent(@Argument name: String, @Argument startTime: String, @Argument sport: String): Event {
+        val event = Event(
+            name = name,
+            startTime = Timestamp.valueOf(LocalDateTime.parse(startTime)),
+            sport = sport,
+            isLive = false
+        )
+        eventRepository.save(event)
+        return event
     }
 }
