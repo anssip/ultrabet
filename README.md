@@ -1,12 +1,18 @@
 # TODO
 
-1. Entities (for JPA)
-2. Repositories
-3. Queries
-4. Mutations
-5. Import feeds from betapi.com
-6. Admin queries and mutations
-7. Bet should have several MarketOptions (long bet)
+- [x] Entities (for JPA)
+- [x] Repositories
+- [x] Queries
+- [x] Mutations
+- [ ] Import feeds from betapi.com
+- [ ] Admin queries and mutations
+- [ ] Bet should have several MarketOptions (long bet)
+- [ ] Result setting, enhance schemas with results
+
+## Event import
+
+- [ ] import each event only once
+- [ ] add a 'source' field to the Market entity, to identify the bookmaker?
 
 ## Frontend
 
