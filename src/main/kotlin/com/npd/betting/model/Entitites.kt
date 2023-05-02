@@ -114,6 +114,9 @@ data class Market(
     @Column(name = "name", nullable = false)
     val name: String,
 
+    @Column(name = "source", nullable = false)
+    val source: String,
+
     @ManyToOne
     @JoinColumn(name = "event_id")
     val event: Event,

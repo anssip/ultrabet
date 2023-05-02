@@ -21,7 +21,7 @@ type Event {
     name: String!
     startTime: String!
     sport: String!
-    markets: [Market]
+    markets(source: String): [Market]
 }
 
 """
@@ -32,6 +32,10 @@ include Moneyline, Point Spread, and Totals (Over/Under).
 """
 type Market {
     id: ID!
+    """
+    What is the source or bookmaker that provides the odds for this Market?
+    """
+    source: String!
     """
     Is this Market available for live betting?
     """

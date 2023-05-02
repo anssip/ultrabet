@@ -49,7 +49,7 @@ class MarketController @Autowired constructor(
     @MutationMapping
     fun createMarket(@Argument name: String, @Argument eventId: Int): Market {
         val event = eventRepository.findById(eventId).orElse(null)
-        val market = Market(name = name, event = event, isLive = false)
+        val market = Market(name = name, event = event, isLive = false, source = "internal")
         marketRepository.save(market)
         return market
     }

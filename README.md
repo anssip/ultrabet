@@ -12,7 +12,8 @@
 ## Event import
 
 - [ ] import each event only once
-- [ ] add a 'source' field to the Market entity, to identify the bookmaker?
+- [x] add a 'source' field to the Market entity, to identify the bookmaker. Event.markets edge should be able to filter
+  based on source.
 
 ## Frontend
 

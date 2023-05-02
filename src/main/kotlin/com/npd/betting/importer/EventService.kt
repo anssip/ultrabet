@@ -32,8 +32,9 @@ class EventService(
                     val market = Market(
                         isLive = event.isLive,
                         lastUpdated = Timestamp(marketData.last_update.time),
-                        name = "${bookmaker.title} - ${marketData.key}",
-                        event = savedEvent
+                        name = marketData.key,
+                        event = savedEvent,
+                        source = bookmaker.key
                     )
                     val savedMarket = marketRepository.save(market)
 

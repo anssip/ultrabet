@@ -19,7 +19,7 @@ class EventController @Autowired constructor(
 ) {
 
     @SchemaMapping(typeName = "Query", field = "getEvent")
-    fun getEvent(@Argument id: Int): Event {
+    fun getEvent(@Argument id: Int): Event? {
         return eventRepository.findById(id).orElse(null)
     }
 
@@ -34,14 +34,19 @@ class EventController @Autowired constructor(
     }
 
     @SchemaMapping(typeName = "Event", field = "markets")
-    fun getEventMarkets(event: Event): List<Market> {
+    fun getEventMarkets(event: Event, @Argument("source") source: String?): List<Market> {
+        val sourceClause = if (source != null) "AND m.source = :source" else "";
         val query = entityManager.createQuery(
-            "SELECT e FROM Event e JOIN FETCH e.markets WHERE e.id = :id", Event::class.java
+            "SELECT e FROM Event e JOIN FETCH e.markets m WHERE e.id = :id $sourceClause", Event::class.java
         )
         query.setParameter("id", event.id)
+        if (source != null) {
+            query.setParameter("source", source)
+        }
         val resultList = query.resultList
         return if (resultList.isEmpty()) emptyList() else resultList[0].markets
     }
+
 
     @MutationMapping
     fun createEvent(@Argument name: String, @Argument startTime: String, @Argument sport: String): Event {

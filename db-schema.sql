@@ -36,6 +36,7 @@ CREATE TABLE `events`
 CREATE TABLE `markets`
 (
     `id`           INT AUTO_INCREMENT PRIMARY KEY,
+    `source`       VARCHAR(255) NOT NULL DEFAULT 'internal',
     `is_live`      BOOLEAN      NOT NULL,
     `last_updated` TIMESTAMP    NULL,
     `name`         VARCHAR(255) NOT NULL,
