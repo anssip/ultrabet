@@ -18,6 +18,8 @@ interface BetRepository : JpaRepository<Bet, Int> {
 
 interface EventRepository : JpaRepository<Event, Int> {
     fun findByIsLiveTrue(): List<Event>
+
+    fun findByExternalId(externalId: String): Event?
 }
 
 interface MarketRepository : JpaRepository<Market, Int> {

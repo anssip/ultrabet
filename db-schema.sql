@@ -26,11 +26,12 @@ CREATE TABLE `transactions`
 
 CREATE TABLE `events`
 (
-    `id`         INT AUTO_INCREMENT PRIMARY KEY,
-    `is_live`    BOOLEAN      NOT NULL,
-    `name`       VARCHAR(255) NOT NULL,
-    `start_time` TIMESTAMP    NOT NULL,
-    `sport`      VARCHAR(255) NOT NULL
+    `id`          INT AUTO_INCREMENT PRIMARY KEY,
+    `external_id` VARCHAR(255) NULL,
+    `is_live`     BOOLEAN      NOT NULL,
+    `name`        VARCHAR(255) NOT NULL,
+    `start_time`  TIMESTAMP    NOT NULL,
+    `sport`       VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE `markets`

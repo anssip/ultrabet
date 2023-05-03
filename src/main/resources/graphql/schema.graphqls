@@ -15,6 +15,10 @@ An Event represents a sports match or competition on which users can place bets.
 type Event {
     id: ID!
     """
+    The id of the event in the source system.
+    """
+    externalId: String
+    """
     Is this event currently live?
     """
     isLive: Boolean!

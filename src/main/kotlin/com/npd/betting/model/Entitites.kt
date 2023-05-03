@@ -82,8 +82,11 @@ data class Event(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
+    @Column(name = "external_id", unique = true)
+    val externalId: String? = null,
+
     @Column(name = "is_live", nullable = false)
-    val isLive: Boolean,
+    var isLive: Boolean,
 
     @Column(name = "name", nullable = false)
     val name: String,
