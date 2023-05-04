@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.jpa") version "1.8.20"
     id("io.ktor.plugin") version "2.3.0"
     kotlin("plugin.serialization") version "1.5.0"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 
@@ -17,7 +17,7 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
-    mavenCentral()which
+    mavenCentral()
 }
 
 dependencies {
