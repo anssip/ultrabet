@@ -9,6 +9,7 @@ plugins {
     id("io.ktor.plugin") version "2.3.0"
     kotlin("plugin.serialization") version "1.5.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("application")
 }
 
 
@@ -57,7 +58,7 @@ tasks.shadowJar {
     archiveVersion.set("")
 
     manifest {
-        attributes["Main-Class"] = "com.npd.betting.BettingGraphqlApi"
+        attributes["Main-Class"] = application.mainClass.get()
     }
 }
 
