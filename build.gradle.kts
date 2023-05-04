@@ -8,6 +8,7 @@ plugins {
     kotlin("plugin.jpa") version "1.8.20"
     id("io.ktor.plugin") version "2.3.0"
     kotlin("plugin.serialization") version "1.5.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 
@@ -16,7 +17,7 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
-    mavenCentral()
+    mavenCentral()which
 }
 
 dependencies {
@@ -49,6 +50,15 @@ dependencies {
     testImplementation("io.ktor:ktor-client-mock")
 
 
+}
+tasks.shadowJar {
+    archiveBaseName.set("ultrabet")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+
+    manifest {
+        attributes["Main-Class"] = "com.npd.bettingh.AppKt"
+    }
 }
 
 tasks.withType<KotlinCompile> {
