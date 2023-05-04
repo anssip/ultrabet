@@ -8,11 +8,15 @@ import org.springframework.stereotype.Controller
 
 @SpringBootApplication
 @EnableScheduling
-class BettingGraphqlApi
-
-fun main(args: Array<String>) {
-    runApplication<BettingGraphqlApi>(*args)
+class BettingGraphqlApi {
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            runApplication<BettingGraphqlApi>(*args)
+        }
+    }
 }
+
 
 @Controller
 class FooController {
