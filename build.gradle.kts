@@ -54,15 +54,22 @@ dependencies {
 
 
 }
-tasks.shadowJar {
-    archiveBaseName.set("ultrabet")
-    archiveClassifier.set("")
-    archiveVersion.set("")
 
-    manifest {
-        attributes["Main-Class"] = application.mainClass.get()
+tasks {
+    withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+        archiveBaseName.set("ultrabet")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+
+        manifest {
+            attributes["Main-Class"] = "com.npd.betting.BettingGraphqlApi"
+        }
+
+        // Set the main class name for the Shadow JAR plugin
+        project.setProperty("mainClassName", "com.npd.betting.BettingGraphqlApi")
     }
 }
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
