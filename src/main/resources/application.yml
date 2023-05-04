@@ -10,3 +10,6 @@ spring:
       ddl-auto: update
   graphql:
     path: /graphql
+    graphiql:
+      enabled: true
+      path: /graphiql
