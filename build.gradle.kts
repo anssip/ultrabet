@@ -11,7 +11,9 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("application")
 }
-
+application {
+    mainClass.set("com.npd.betting.BettingGraphqlApi")
+}
 
 group = "com.npd.betting"
 version = "0.0.1-SNAPSHOT"
