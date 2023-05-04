@@ -57,7 +57,7 @@ tasks.shadowJar {
     archiveVersion.set("")
 
     manifest {
-        attributes["Main-Class"] = "com.npd.bettingh.AppKt"
+        attributes["Main-Class"] = "com.npd.betting.BettingGraphqlApi"
     }
 }
 
