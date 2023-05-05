@@ -8,7 +8,7 @@
 - [ ] Admin queries and mutations
 - [ ] Bet should have several MarketOptions (long bet)
 - [ ] Result setting, enhance schemas with results
-- [ ] Deploy somewhere
+- [x] Deploy somewhere
 
 ## Event import
 

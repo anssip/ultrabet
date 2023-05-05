@@ -7,24 +7,25 @@ import org.springframework.data.jpa.repository.JpaRepository
 // https://www.tutorialspoint.com/spring_boot_jpa/spring_boot_jpa_repository_methods.htm
 
 interface UserRepository : JpaRepository<User, Int> {
-    // Custom methods can be added here if needed
+  // Custom methods can be added here if needed
 }
 
 interface WalletRepository : JpaRepository<Wallet, Int>
 
 interface BetRepository : JpaRepository<Bet, Int> {
-    fun findByUserId(userId: Int): List<Bet>
+  fun findByUserId(userId: Int): List<Bet>
 }
 
 interface EventRepository : JpaRepository<Event, Int> {
-    fun findByIsLiveTrue(): List<Event>
+  fun findByIsLiveTrueAndCompletedFalse(): List<Event>
 
-    fun findByExternalId(externalId: String): Event?
+  fun findByExternalId(externalId: String): Event?
+
 }
 
 interface MarketRepository : JpaRepository<Market, Int> {
-    fun findByEventId(eventId: Int): List<Market>
-    fun findByEventIdAndIsLiveTrue(eventId: Int): List<Market>
+  fun findByEventId(eventId: Int): List<Market>
+  fun findByEventIdAndIsLiveTrue(eventId: Int): List<Market>
 }
 
 interface MarketOptionRepository : JpaRepository<MarketOption, Int>

@@ -31,7 +31,8 @@ CREATE TABLE `events`
     `is_live`     BOOLEAN      NOT NULL,
     `name`        VARCHAR(255) NOT NULL,
     `start_time`  TIMESTAMP    NOT NULL,
-    `sport`       VARCHAR(255) NOT NULL
+    `sport`       VARCHAR(255) NOT NULL,
+    `completed`   BOOLEAN      NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE `markets`
