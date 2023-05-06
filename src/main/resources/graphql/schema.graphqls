@@ -26,6 +26,7 @@ type Event {
     startTime: String!
     sport: String!
     markets(source: String): [Market]
+    scores: [ScoreUpdate]
 }
 
 """
@@ -70,6 +71,14 @@ type MarketOption {
     odds: Float!
     marketId: ID!
     market: Market
+}
+
+type ScoreUpdate {
+    id: ID!
+    event: Event!
+    score: String!
+    name: String!
+    timestamp: DateTime!
 }
 
 type BetOption {

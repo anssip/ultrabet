@@ -35,6 +35,9 @@ CREATE TABLE `events`
     `completed`   BOOLEAN      NOT NULL DEFAULT FALSE
 );
 
+CREATE UNIQUE INDEX `unique_events_external_id` ON events (`external_id`);
+
+
 CREATE TABLE `markets`
 (
     `id`           INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,6 +49,8 @@ CREATE TABLE `markets`
     FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
 );
 
+CREATE UNIQUE INDEX `unique_markets_event_id_name_source` ON markets (`event_id`, `name`, `source`);
+
 CREATE TABLE `market_options`
 (
     `id`           INT AUTO_INCREMENT PRIMARY KEY,
@@ -54,6 +59,16 @@ CREATE TABLE `market_options`
     `odds`         DECIMAL(10, 2) NOT NULL,
     `market_id`    INT            NOT NULL,
     FOREIGN KEY (`market_id`) REFERENCES `markets` (`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `score_updates`
+(
+    `id`        INT AUTO_INCREMENT PRIMARY KEY,
+    `event_id`  INT          NOT NULL,
+    `name`      VARCHAR(255) NOT NULL,
+    `score`     VARCHAR(255) NOT NULL,
+    `timestamp` TIMESTAMP    NOT NULL,
+    FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `bets`

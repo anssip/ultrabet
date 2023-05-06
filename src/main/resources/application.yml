@@ -8,8 +8,22 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql:
+          true
   graphql:
     path: /graphql
     graphiql:
       enabled: true
       path: /graphiql
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: ERROR
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE

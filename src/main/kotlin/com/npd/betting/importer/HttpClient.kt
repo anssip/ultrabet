@@ -9,14 +9,14 @@ import kotlinx.serialization.json.Json
 
 
 var httpClient = HttpClient(CIO) {
-    install(ContentNegotiation) {
-        json(Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-        })
-    }
-    install(Logging) {
-        logger = Logger.DEFAULT
-        level = LogLevel.ALL
-    }
+  install(ContentNegotiation) {
+    json(Json {
+      ignoreUnknownKeys = true
+      isLenient = true
+    })
+  }
+  install(Logging) {
+    logger = Logger.DEFAULT
+    level = LogLevel.NONE
+  }
 }

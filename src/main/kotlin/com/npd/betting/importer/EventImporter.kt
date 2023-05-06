@@ -9,6 +9,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 
@@ -21,13 +22,22 @@ data class EventData(
   val commence_time: Date,
   val home_team: String,
   val away_team: String,
-  val bookmakers: List<Bookmaker>,
-  var completed: Boolean? = false
+  val bookmakers: List<Bookmaker>? = null,
+  var completed: Boolean? = false,
+  var scores: List<Score>? = null,
+  @Serializable(with = DateSerializer::class)
+  var last_update: Date? = null
 ) {
   fun isLive(): Boolean {
-    return Date().before(commence_time) && !completed!!
+    return Date().after(commence_time) && !completed!!
   }
 }
+
+@Serializable
+data class Score(
+  val name: String,
+  val score: String
+)
 
 @Serializable
 data class Bookmaker(
@@ -57,11 +67,13 @@ data class MarketOptionData(
 class EventImporter(private val service: EventService) {
   companion object {
     const val API_KEY = "407cf42047dd81f1c87c56d4df701971"
+    const val API_BASE = "https://api.the-odds-api.com/v4/"
     const val API_URL =
-      "https://api.the-odds-api.com/v4/sports/upcoming/odds/?regions=eu&markets=h2h&apiKey=$API_KEY"
+      "$API_BASE/sports/upcoming/odds/?regions=eu&markets=h2h&apiKey=$API_KEY"
   }
 
   @Scheduled(fixedRate = 60000) // Poll the API every minute (60000 milliseconds)
+  @Transactional
   fun importEvents() {
     runBlocking {
       doImport()

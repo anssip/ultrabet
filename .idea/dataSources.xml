@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mysql://localhost:3306/betting1</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="Ultrabet @Heroku" uuid="e14d20c3-6767-4164-b031-53cc27d35488">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://us-cdbr-east-06.cleardb.net/heroku_d4698f7ea322bd9?reconnect=true:3306/betting1</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

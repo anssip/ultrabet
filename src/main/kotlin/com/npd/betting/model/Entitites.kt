@@ -101,7 +101,10 @@ data class Event(
   val sport: String,
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
-  val markets: List<Market> = emptyList()
+  val markets: List<Market> = emptyList(),
+
+  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
+  val scoreUpdates: List<ScoreUpdate> = emptyList()
 )
 
 @Entity
@@ -153,6 +156,27 @@ data class MarketOption(
 
   @OneToMany(mappedBy = "marketOption", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
   val betOptions: MutableList<BetOption> = mutableListOf()
+)
+
+@Entity
+@Table(name = "score_updates")
+data class ScoreUpdate(
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  val id: Int = 0,
+
+  @ManyToOne
+  @JoinColumn(name = "event_id")
+  val event: Event,
+
+  @Column(name = "score", nullable = false)
+  val score: String,
+
+  @Column(name = "name", nullable = false)
+  val name: String,
+
+  @Column(name = "timestamp", nullable = false)
+  val timestamp: Timestamp
 )
 
 @Entity

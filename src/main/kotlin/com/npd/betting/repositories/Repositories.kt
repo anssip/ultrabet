@@ -26,6 +26,8 @@ interface EventRepository : JpaRepository<Event, Int> {
 interface MarketRepository : JpaRepository<Market, Int> {
   fun findByEventId(eventId: Int): List<Market>
   fun findByEventIdAndIsLiveTrue(eventId: Int): List<Market>
+  fun findByEventIdAndSourceAndName(eventId: Int, source: String, name: String): Market?
+
 }
 
 interface MarketOptionRepository : JpaRepository<MarketOption, Int>
@@ -33,3 +35,9 @@ interface MarketOptionRepository : JpaRepository<MarketOption, Int>
 interface TransactionRepository : JpaRepository<Transaction, Int>
 
 interface BetOptionRepository : JpaRepository<BetOption, Int>
+
+interface ScoreUpdateRepository : JpaRepository<ScoreUpdate, Int> {
+  fun findByEventId(eventId: Int): List<ScoreUpdate>
+
+  fun deleteByEventId(eventId: Int)
+}
