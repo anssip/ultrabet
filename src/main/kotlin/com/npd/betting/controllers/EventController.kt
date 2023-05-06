@@ -2,6 +2,7 @@ package com.npd.betting.controllers
 
 import com.npd.betting.model.Event
 import com.npd.betting.model.Market
+import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,6 +48,16 @@ class EventController @Autowired constructor(
     return if (resultList.isEmpty()) emptyList() else resultList[0].markets
   }
 
+  @SchemaMapping(typeName = "Event", field = "scoreUpdates")
+  fun getEventScoreUpdates(event: Event): List<ScoreUpdate> {
+    val query = entityManager.createQuery(
+      "SELECT e FROM Event e JOIN FETCH e.scoreUpdates s WHERE e.id = :id", Event::class.java
+    )
+    query.setParameter("id", event.id)
+    val resultList = query.resultList
+    return if (resultList.isEmpty()) emptyList() else resultList[0].scoreUpdates
+
+  }
 
   @MutationMapping
   fun createEvent(@Argument name: String, @Argument startTime: String, @Argument sport: String): Event {
