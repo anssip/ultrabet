@@ -22,6 +22,10 @@ type Event {
     Is this event currently live?
     """
     isLive: Boolean!
+    """
+    Is this event completed?
+    """
+    completed: Boolean!
     name: String!
     startTime: String!
     sport: String!
