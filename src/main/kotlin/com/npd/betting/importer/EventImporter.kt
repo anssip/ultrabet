@@ -22,7 +22,7 @@ data class EventData(
   val commence_time: Date,
   val home_team: String,
   val away_team: String,
-  val bookmakers: List<Bookmaker>? = null,
+  var bookmakers: List<Bookmaker>? = null,
   var completed: Boolean? = false,
   var scores: List<Score>? = null,
   @Serializable(with = DateSerializer::class)

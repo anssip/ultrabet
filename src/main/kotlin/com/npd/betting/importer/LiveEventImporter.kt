@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional
 class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
   fun getEventApiURL(eventIds: List<String>): String {
     val eventIdString = eventIds.joinToString(",")
-    return "${EventImporter.API_BASE}/sports/upcoming/odds/?regions=eu&markets=h2h&eventIds=${eventIdString}&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/upcoming/odds/?&markets=h2h&regions=uk,us,us2,eu,au&eventIds=${eventIdString}&apiKey=${EventImporter.API_KEY}"
   }
 
   fun getScoresApiURL(sport: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/scores/?regions=eu&markets=h2h&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=h2h&apiKey=${EventImporter.API_KEY}"
   }
 
   @Scheduled(fixedDelay = 10000)
@@ -34,21 +34,22 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     val liveEvents = eventRepository.findByIsLiveTrueAndCompletedFalse()
     println("Found ${liveEvents.size} live events")
 
+    // TODO: save `external_sport_id` to DB and fetch odds using GET event odds
     val eventData = fetchEvents(liveEvents.map { it.externalId!! })
     println("Fetched ${eventData.size} events from bets-api.com")
 
-    eventData.forEach() {
-      service.saveEventAndOdds(it, true)
-    }
     val sports = eventData.map { it.sport_key }.distinct()
     println("Fetching scores for $sports sports")
     sports.forEach() {
       val eventsWithScores = fetchScores(it)
       if (eventsWithScores.isNotEmpty()) {
-        eventsWithScores.forEach() {
-          val event = liveEvents.find() { liveEvent -> liveEvent.externalId == it.id }
+        eventsWithScores.forEach() { eventWithScores: EventData ->
+          val event = liveEvents.find() { liveEvent -> liveEvent.externalId == eventWithScores.id }
           if (event !== null) {
-            service.saveScores(it, event)
+            val eventWithOdds = eventData.find() { eventData -> eventData.id == eventWithScores.id }
+            eventWithScores.bookmakers = eventWithOdds?.bookmakers
+            service.saveEventAndOdds(eventWithScores, true)
+            service.saveScores(eventWithScores, event)
           }
         }
       }

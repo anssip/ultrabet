@@ -73,7 +73,7 @@ class EventService(
     }
 
     if (eventData.bookmakers != null) {
-      eventData.bookmakers.forEach { bookmaker ->
+      eventData.bookmakers!!.forEach { bookmaker ->
         bookmaker.markets.forEach { marketData ->
           val existingMarket = marketRepository.findByEventIdAndSourceAndName(event.id, bookmaker.key, marketData.key)
           if (existingMarket != null) {
