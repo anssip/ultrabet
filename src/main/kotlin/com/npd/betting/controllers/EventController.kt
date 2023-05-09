@@ -4,6 +4,7 @@ import com.npd.betting.model.Event
 import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
+import com.npd.betting.repositories.SportRepository
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
@@ -16,6 +17,7 @@ import java.time.LocalDateTime
 @Controller
 class EventController @Autowired constructor(
   private val eventRepository: EventRepository,
+  private val sportRepository: SportRepository,
   private val entityManager: EntityManager
 ) {
 
@@ -61,10 +63,11 @@ class EventController @Autowired constructor(
 
   @MutationMapping
   fun createEvent(@Argument name: String, @Argument startTime: String, @Argument sport: String): Event {
+    val sportEntity = sportRepository.findByKey(sport) ?: throw Exception("Sport with key $sport does not exist")
     val event = Event(
       name = name,
       startTime = Timestamp.valueOf(LocalDateTime.parse(startTime)),
-      sport = sport,
+      sport = sportEntity,
       isLive = false,
       completed = false
     )

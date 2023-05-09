@@ -31,8 +31,19 @@ CREATE TABLE `events`
     `is_live`     BOOLEAN      NOT NULL,
     `name`        VARCHAR(255) NOT NULL,
     `start_time`  TIMESTAMP    NOT NULL,
-    `sport`       VARCHAR(255) NOT NULL,
-    `completed`   BOOLEAN      NOT NULL DEFAULT FALSE
+    `completed`   BOOLEAN      NOT NULL DEFAULT FALSE,
+);
+
+CREATE TABLE `sports`
+(
+    `id`   INT AUTO_INCREMENT PRIMARY KEY,
+    `key` VARCHAR(255) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` VARCHAR(255) NOT NULL,
+    `group` VARCHAR(255) NOT NULL,
+    `active` BOOLEAN NOT NULL DEFAULT TRUE,
+    `has_outrights` BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (`key`) REFERENCES `events` (`sport`) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX `unique_events_external_id` ON events (`external_id`);

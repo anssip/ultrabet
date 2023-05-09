@@ -34,6 +34,16 @@ data class EventData(
 }
 
 @Serializable
+data class SportData(
+  val key: String,
+  val active: Boolean,
+  val group: String,
+  val description: String,
+  val title: String,
+  val has_outrights: Boolean
+)
+
+@Serializable
 data class Score(
   val name: String,
   val score: String
@@ -44,7 +54,7 @@ data class Bookmaker(
   val key: String,
   val title: String,
   @Serializable(with = DateSerializer::class)
-  val last_update: Date,
+  val last_update: Date? = null,
   val markets: List<MarketData>
 )
 
@@ -68,8 +78,9 @@ class EventImporter(private val service: EventService) {
   companion object {
     const val API_KEY = "407cf42047dd81f1c87c56d4df701971"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
-    const val API_URL =
+    const val EVENTS_URL =
       "$API_BASE/sports/upcoming/odds/?regions=eu&markets=h2h&apiKey=$API_KEY"
+    const val SPORTS_URL = "$API_BASE/sports/?apiKey=$API_KEY"
   }
 
   @Scheduled(fixedRate = 60000) // Poll the API every minute (60000 milliseconds)
@@ -81,13 +92,26 @@ class EventImporter(private val service: EventService) {
   }
 
   suspend fun doImport() {
+    val sports = this.fetchSports()
+    println("Importing ${sports.size} sports")
+    service.importSports(sports)
+
     val events = this.fetchEvents()
     println("Importing ${events.size} events")
     service.importEvents(events)
   }
 
+  suspend fun fetchSports(): List<SportData> {
+    val response: HttpResponse = httpClient.get(SPORTS_URL)
+    if (response.status != HttpStatusCode.OK) {
+      throw IllegalStateException("Failed to fetch sports")
+    }
+    val responseBody = response.bodyAsText()
+    return Json.decodeFromString(ListSerializer(SportData.serializer()), responseBody)
+  }
+
   suspend fun fetchEvents(): List<EventData> {
-    val response: HttpResponse = httpClient.get(API_URL)
+    val response: HttpResponse = httpClient.get(EVENTS_URL)
     if (response.status != HttpStatusCode.OK) {
       throw IllegalStateException("Failed to fetch events")
     }

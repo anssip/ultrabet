@@ -1,13 +1,7 @@
 package com.npd.betting.importer
 
-import com.npd.betting.model.Event
-import com.npd.betting.model.Market
-import com.npd.betting.model.MarketOption
-import com.npd.betting.model.ScoreUpdate
-import com.npd.betting.repositories.EventRepository
-import com.npd.betting.repositories.MarketOptionRepository
-import com.npd.betting.repositories.MarketRepository
-import com.npd.betting.repositories.ScoreUpdateRepository
+import com.npd.betting.model.*
+import com.npd.betting.repositories.*
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -20,6 +14,7 @@ class EventService(
   private val marketRepository: MarketRepository,
   private val marketOptionRepository: MarketOptionRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
+  private val sportRepository: SportRepository,
   private val entityManager: EntityManager
 ) {
   suspend fun importEvents(eventsData: List<EventData>) {
@@ -57,11 +52,14 @@ class EventService(
         existing
       )
     } else {
+      val sportEntity = sportRepository.findByKey(eventData.sport_key)
+        ?: throw Exception("Sport with key ${eventData.sport_key} does not exist")
+
       val newEvent = Event(
         isLive = eventData.isLive(),
         name = "${eventData.home_team} vs ${eventData.away_team}",
         startTime = Timestamp(eventData.commence_time.time),
-        sport = eventData.sport_title,
+        sport = sportEntity,
         externalId = eventData.id
       )
       if (eventData.completed != null) {
@@ -139,6 +137,29 @@ class EventService(
           // no existing scores
           scoreUpdateRepository.save(score)
         }
+      }
+    }
+  }
+
+  fun importSports(sports: List<SportData>) {
+    sports.forEach() { sportData ->
+      val existing = sportRepository.findByKey(sportData.key)
+      if (existing != null) {
+        println("Sport ${sportData.key} already exists, updating active value...")
+        existing.active = sportData.active
+        sportRepository.save(existing)
+      } else {
+        val newSport = Sport(
+          key = sportData.key,
+          active = sportData.active,
+          title = sportData.title,
+          group = sportData.group,
+          hasOutrights = sportData.has_outrights,
+          description = sportData.description
+        )
+        sportRepository.save(
+          newSport
+        )
       }
     }
   }

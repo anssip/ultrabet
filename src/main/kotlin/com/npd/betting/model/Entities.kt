@@ -97,14 +97,44 @@ data class Event(
   @Column(name = "start_time", nullable = false)
   val startTime: Timestamp,
 
-  @Column(name = "sport", nullable = false)
-  val sport: String,
+  @ManyToOne
+  @JoinColumn(name = "sport")
+  val sport: Sport,
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
   val markets: List<Market> = emptyList(),
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
   val scoreUpdates: List<ScoreUpdate> = emptyList()
+)
+
+@Entity
+@Table(name = "sports")
+data class Sport(
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  val id: Int = 0,
+
+  @Column(name = "`key`", nullable = false)
+  val key: String,
+
+  @Column(name = "title", nullable = false)
+  val title: String,
+
+  @Column(name = "description", nullable = false)
+  val description: String,
+
+  @Column(name = "groupId", nullable = false)
+  val group: String,
+
+  @Column(name = "active", nullable = false)
+  var active: Boolean,
+
+  @Column(name = "has_outrights", nullable = false)
+  val hasOutrights: Boolean,
+
+  @OneToMany(mappedBy = "sport")
+  val events: List<Event> = emptyList()
 )
 
 @Entity

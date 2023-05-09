@@ -1,11 +1,13 @@
 package com.npd.betting.importer
 
+import com.npd.betting.model.Event
 import com.npd.betting.repositories.EventRepository
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -13,9 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
-  fun getEventApiURL(eventIds: List<String>): String {
-    val eventIdString = eventIds.joinToString(",")
-    return "${EventImporter.API_BASE}/sports/upcoming/odds/?&markets=h2h&regions=uk,us,us2,eu,au&eventIds=${eventIdString}&apiKey=${EventImporter.API_KEY}"
+  fun getEventApiURL(sport: String, eventId: String): String {
+    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=uk,us,us2,eu,au&apiKey=${EventImporter.API_KEY}"
   }
 
   fun getScoresApiURL(sport: String): String {
@@ -34,8 +35,7 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     val liveEvents = eventRepository.findByIsLiveTrueAndCompletedFalse()
     println("Found ${liveEvents.size} live events")
 
-    // TODO: save `external_sport_id` to DB and fetch odds using GET event odds
-    val eventData = fetchEvents(liveEvents.map { it.externalId!! })
+    val eventData = fetchEvents(liveEvents)
     println("Fetched ${eventData.size} events from bets-api.com")
 
     val sports = eventData.map { it.sport_key }.distinct()
@@ -56,16 +56,24 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     }
   }
 
-  suspend fun fetchEvents(eventIds: List<String>): List<EventData> {
-    val response: HttpResponse =
-      httpClient.request(getEventApiURL(eventIds)) {
-        method = HttpMethod.Get
+  suspend fun fetchEvents(events: List<Event>): List<EventData> {
+    val data = events.mapNotNull() {
+      println("Fetching odds for event ${it.externalId} and sport ${it.sport.key}")
+      val response: HttpResponse =
+        httpClient.request(getEventApiURL(it.sport.key, it.externalId!!)) {
+          method = HttpMethod.Get
+        }
+      if (response.status != HttpStatusCode.OK) {
+        println("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
+        //throw IllegalStateException("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
+        // TODO: maybe update as completed
+        null
+      } else {
+        val responseBody = response.bodyAsText()
+        Json.decodeFromString<EventData>(responseBody)
       }
-    if (response.status != HttpStatusCode.OK) {
-      throw IllegalStateException("Failed to fetch events")
     }
-    val responseBody = response.bodyAsText()
-    return Json.decodeFromString(ListSerializer(EventData.serializer()), responseBody)
+    return data
   }
 
   suspend fun fetchScores(sport: String): List<EventData> {

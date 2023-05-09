@@ -10,7 +10,9 @@
 - [ ] Result setting, enhance schemas with results
 - [x] Deploy somewhere
 - [ ] Pagination TBD when building the UI
-- [ ] completed events query
+- [ ] add completedEvents query
+- [ ] database indexes
+-
 
 ## Event import
 

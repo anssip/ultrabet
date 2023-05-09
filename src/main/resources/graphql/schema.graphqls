@@ -28,9 +28,25 @@ type Event {
     completed: Boolean!
     name: String!
     startTime: String!
-    sport: String!
+    sport: Sport!
     markets(source: String): [Market]
     scoreUpdates: [ScoreUpdate]
+}
+
+type Sport {
+    id: ID!
+    key: String!
+    """
+    Is this sport in season at the moment?
+    """
+    active: Boolean!
+    group: String!
+    description: String!
+    title: String!
+    """
+    Does this sport have outright markets?
+    """
+    hasOutrights: Boolean!
 }
 
 """
