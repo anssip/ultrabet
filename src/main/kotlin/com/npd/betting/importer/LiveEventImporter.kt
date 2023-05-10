@@ -38,7 +38,13 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     val eventData = fetchEvents(liveEvents)
     println("Fetched ${eventData.size} events from bets-api.com")
 
-    val sports = eventData.map { it.sport_key }.distinct()
+    val notfound = eventData.mapNotNull { it.second }
+    notfound.forEach() {
+      println("Updating event $it completed")
+      service.updateCompleted(it, true)
+    }
+
+    val sports = eventData.mapNotNull { it.first?.sport_key }.distinct()
     println("Fetching scores for $sports sports")
     sports.forEach() {
       val eventsWithScores = fetchScores(it)
@@ -46,7 +52,8 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
         eventsWithScores.forEach() { eventWithScores: EventData ->
           val event = liveEvents.find() { liveEvent -> liveEvent.externalId == eventWithScores.id }
           if (event !== null) {
-            val eventWithOdds = eventData.find() { eventData -> eventData.id == eventWithScores.id }
+            val eventWithOdds =
+              eventData.mapNotNull { it.first }.find() { eventData -> eventData.id == eventWithScores.id }
             eventWithScores.bookmakers = eventWithOdds?.bookmakers
             service.saveEventAndOdds(eventWithScores, true)
             service.saveScores(eventWithScores, event)
@@ -56,8 +63,8 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     }
   }
 
-  suspend fun fetchEvents(events: List<Event>): List<EventData> {
-    val data = events.mapNotNull() {
+  suspend fun fetchEvents(events: List<Event>): List<Pair<EventData?, Int?>> {
+    val data = events.map() {
       println("Fetching odds for event ${it.externalId} and sport ${it.sport.key}")
       val response: HttpResponse =
         httpClient.request(getEventApiURL(it.sport.key, it.externalId!!)) {
@@ -66,11 +73,10 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
       if (response.status != HttpStatusCode.OK) {
         println("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
         //throw IllegalStateException("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
-        // TODO: maybe update as completed
-        null
+        Pair(null, it.id)
       } else {
         val responseBody = response.bodyAsText()
-        Json.decodeFromString<EventData>(responseBody)
+        Pair(Json.decodeFromString<EventData>(responseBody), null)
       }
     }
     return data

@@ -163,4 +163,10 @@ class EventService(
       }
     }
   }
+
+  fun updateCompleted(eventId: Int, completed: Boolean) {
+    val event = eventRepository.findById(eventId).get()
+    event.completed = completed
+    eventRepository.save(event)
+  }
 }

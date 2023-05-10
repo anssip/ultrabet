@@ -76,7 +76,7 @@ data class MarketOptionData(
 @Component
 class EventImporter(private val service: EventService) {
   companion object {
-    const val API_KEY = "407cf42047dd81f1c87c56d4df701971"
+    const val API_KEY = "fb2a903bfc8c151b2bd88f3ebd16dd99"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
     const val EVENTS_URL =
       "$API_BASE/sports/upcoming/odds/?regions=eu&markets=h2h&apiKey=$API_KEY"
