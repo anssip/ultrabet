@@ -29,7 +29,7 @@ data class EventData(
   var last_update: Date? = null
 ) {
   fun isLive(): Boolean {
-    return Date().after(commence_time) && !completed!!
+    return Date().after(commence_time)
   }
 }
 
