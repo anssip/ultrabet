@@ -164,9 +164,10 @@ class EventService(
     }
   }
 
-  fun updateCompleted(eventId: Int, completed: Boolean) {
+  fun updateCompleted(eventId: Int) {
     val event = eventRepository.findById(eventId).get()
-    event.completed = completed
+    event.completed = event.startTime.before(Date())
+    println("Updating event ${event.id} completed to ${event.completed}")
     eventRepository.save(event)
   }
 }

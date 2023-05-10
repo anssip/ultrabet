@@ -40,8 +40,7 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
 
     val notfound = eventData.mapNotNull { it.second }
     notfound.forEach() {
-      println("Updating event $it completed")
-      service.updateCompleted(it, true)
+      service.updateCompleted(it)
     }
 
     val sports = eventData.mapNotNull { it.first?.sport_key }.distinct()
