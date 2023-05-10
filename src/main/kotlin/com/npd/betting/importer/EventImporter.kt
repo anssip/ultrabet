@@ -79,7 +79,7 @@ class EventImporter(private val service: EventService) {
     const val API_KEY = "fb2a903bfc8c151b2bd88f3ebd16dd99"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
     const val EVENTS_URL =
-      "$API_BASE/sports/upcoming/odds/?regions=eu&markets=h2h&apiKey=$API_KEY"
+      "$API_BASE/sports/upcoming/odds/?regions=eu&markets=h2h&bookmakers=bet365,unibet_eu,betfair,betclic&apiKey=$API_KEY"
     const val SPORTS_URL = "$API_BASE/sports/?apiKey=$API_KEY"
   }
 

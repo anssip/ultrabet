@@ -21,10 +21,10 @@ class EventService(
     eventsData.forEach { eventData ->
       val existing = eventRepository.findByExternalId(eventData.id)
       if (existing != null) {
-        if (eventData.isLive()) {
-          println("Event ${eventData.id} is now live")
-        }
-        if (existing.isLive != eventData.isLive()) {
+        println("event commence time: ${eventData.commence_time}}, current time: ${Date()}, is live based on time? ${eventData.isLive()}")
+        println("eventData.completed: ${eventData.completed}")
+
+        if (existing.isLive != eventData.isLive() || existing.completed != eventData.completed) {
           println("Event ${eventData.id} is now ${if (eventData.isLive()) "live" else "not live"}")
           existing.isLive = eventData.isLive()
           existing.completed = eventData.completed ?: existing.completed
