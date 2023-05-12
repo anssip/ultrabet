@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
   fun getEventApiURL(sport: String, eventId: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=us,eu&bookmakers=bet365,unibet_eu,betfair,betclic&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=uk,us,us2,eu,au&bookmakers=bet365,unibet_eu,betfair,betclic&apiKey=${EventImporter.API_KEY}"
   }
 
   fun getScoresApiURL(sport: String): String {
