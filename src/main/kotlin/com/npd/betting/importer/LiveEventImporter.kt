@@ -16,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
   fun getEventApiURL(sport: String, eventId: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=uk,us,us2,eu,au&bookmakers=bet365,unibet_eu,betfair,betclic&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=uk,us,us2,eu,au&bookmakers=bet365,unibet_eu,betfair,betclic&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
   }
 
   fun getScoresApiURL(sport: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=h2h&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=h2h&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
   }
 
   @Scheduled(fixedDelay = 10000)

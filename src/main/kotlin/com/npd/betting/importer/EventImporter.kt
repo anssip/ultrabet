@@ -18,18 +18,16 @@ data class EventData(
   val id: String,
   val sport_key: String,
   val sport_title: String,
-  @Serializable(with = DateSerializer::class)
-  val commence_time: Date,
+  val commence_time: Long,
   val home_team: String,
   val away_team: String,
   var bookmakers: List<Bookmaker>? = null,
   var completed: Boolean? = false,
   var scores: List<Score>? = null,
-  @Serializable(with = DateSerializer::class)
-  var last_update: Date? = null
+  var last_update: Long? = null
 ) {
   fun isLive(): Boolean {
-    return Date().after(commence_time)
+    return Date().time > commence_time
   }
 }
 
@@ -53,16 +51,14 @@ data class Score(
 data class Bookmaker(
   val key: String,
   val title: String,
-  @Serializable(with = DateSerializer::class)
-  val last_update: Date? = null,
+  val last_update: Long? = null,
   val markets: List<MarketData>
 )
 
 @Serializable
 data class MarketData(
   val key: String,
-  @Serializable(with = DateSerializer::class)
-  val last_update: Date,
+  val last_update: Long,
   val outcomes: List<MarketOptionData>
 )
 
@@ -79,7 +75,7 @@ class EventImporter(private val service: EventService) {
     const val API_KEY = "fb2a903bfc8c151b2bd88f3ebd16dd99"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
     const val EVENTS_URL =
-      "$API_BASE/sports/upcoming/odds/?regions=uk,us,us2,eu,au&markets=h2h&bookmakers=bet365,unibet_eu,betfair,betclic&apiKey=$API_KEY"
+      "$API_BASE/sports/upcoming/odds/?regions=uk,us,us2,eu,au&markets=h2h&bookmakers=bet365,unibet_eu,betfair,betclic&dateFormat=unix&apiKey=$API_KEY"
     const val SPORTS_URL = "$API_BASE/sports/?apiKey=$API_KEY"
   }
 
