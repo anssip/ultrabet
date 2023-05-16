@@ -8,13 +8,6 @@
       <jdbc-url>jdbc:mysql://localhost:3306/betting1</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="@ultrabet1.ccvml62cwrok.eu-north-1.rds.amazonaws.com" uuid="42c44a52-33cc-425d-a3ad-fa7ef9adc9f0">
-      <driver-ref>mysql.8</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://ultrabet1.ccvml62cwrok.eu-north-1.rds.amazonaws.com:3306</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="heroku_23ce1801d1686a5@us-cdbr-east-06.cleardb.net" uuid="f49fed0f-28ca-48b9-aa7f-b8a6f5f234ac">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
