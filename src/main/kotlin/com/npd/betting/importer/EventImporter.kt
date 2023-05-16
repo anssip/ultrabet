@@ -27,7 +27,7 @@ data class EventData(
   var last_update: Long? = null
 ) {
   fun isLive(): Boolean {
-    return Date().time > commence_time
+    return Date().time > commence_time * 1000
   }
 }
 

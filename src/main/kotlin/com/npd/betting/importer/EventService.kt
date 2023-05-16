@@ -21,7 +21,7 @@ class EventService(
     eventsData.forEach { eventData ->
       val existing = eventRepository.findByExternalId(eventData.id)
       if (existing != null) {
-        println("event commence time: ${Date(eventData.commence_time)}, current time: ${Date()}, is live based on time? ${eventData.isLive()}")
+        println("event commence time: ${Date(eventData.commence_time * 1000)}, current time: ${Date()}, is live based on time? ${eventData.isLive()}")
         println("eventData.completed: ${eventData.completed}")
 
         if (existing.isLive != eventData.isLive() || existing.completed != eventData.completed) {
@@ -58,7 +58,7 @@ class EventService(
       val newEvent = Event(
         isLive = eventData.isLive(),
         name = "${eventData.home_team} vs ${eventData.away_team}",
-        startTime = Timestamp(eventData.commence_time),
+        startTime = Timestamp(eventData.commence_time * 1000),
         sport = sportEntity,
         externalId = eventData.id
       )
@@ -75,7 +75,7 @@ class EventService(
         bookmaker.markets.forEach { marketData ->
           val existingMarket = marketRepository.findByEventIdAndSourceAndName(event.id, bookmaker.key, marketData.key)
           if (existingMarket != null) {
-            if (existingMarket.lastUpdated!!.time > marketData.last_update) {
+            if (existingMarket.lastUpdated!!.time > marketData.last_update * 1000) {
               // update market
               println("Event ${event.id}, market ${marketData.key}, source: ${bookmaker.key} has been updated")
               entityManager.remove(existingMarket)
@@ -99,7 +99,7 @@ class EventService(
   ) {
     val market = Market(
       isLive = event.isLive,
-      lastUpdated = Timestamp(marketData.last_update),
+      lastUpdated = Timestamp(marketData.last_update * 1000),
       name = marketData.key,
       event = event,
       source = bookmaker.key
