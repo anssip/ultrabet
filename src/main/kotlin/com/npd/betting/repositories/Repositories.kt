@@ -18,6 +18,7 @@ interface BetRepository : JpaRepository<Bet, Int> {
 
 interface EventRepository : JpaRepository<Event, Int> {
   fun findByIsLiveTrueAndCompletedFalse(): List<Event>
+  fun findByIsLiveFalseAndCompletedFalse(): List<Event>
 
   fun findByExternalId(externalId: String): Event?
 }

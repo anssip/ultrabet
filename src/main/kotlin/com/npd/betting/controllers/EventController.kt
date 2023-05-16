@@ -28,7 +28,7 @@ class EventController @Autowired constructor(
 
   @SchemaMapping(typeName = "Query", field = "listEvents")
   fun listEvents(): List<Event> {
-    return eventRepository.findAll()
+    return eventRepository.findByIsLiveFalseAndCompletedFalse()
   }
 
   @SchemaMapping(typeName = "Query", field = "listLiveEvents")

@@ -15,50 +15,50 @@ import java.math.BigDecimal
 
 @Controller
 class MarketController @Autowired constructor(
-    private val marketRepository: MarketRepository,
-    private val marketOptionRepository: MarketOptionRepository,
-    private val eventRepository: EventRepository,
-    private val entityManager: EntityManager
+  private val marketRepository: MarketRepository,
+  private val marketOptionRepository: MarketOptionRepository,
+  private val eventRepository: EventRepository,
+  private val entityManager: EntityManager
 ) {
 
-    @SchemaMapping(typeName = "Query", field = "getMarket")
-    fun getMarket(@Argument id: Int): Market {
-        return marketRepository.findById(id).orElse(null)
-    }
+  @SchemaMapping(typeName = "Query", field = "getMarket")
+  fun getMarket(@Argument id: Int): Market {
+    return marketRepository.findById(id).orElse(null)
+  }
 
-    @SchemaMapping(typeName = "Query", field = "listMarkets")
-    fun listMarkets(@Argument eventId: Int): List<Market> {
-        return marketRepository.findByEventId(eventId)
-    }
+  @SchemaMapping(typeName = "Query", field = "listMarkets")
+  fun listMarkets(@Argument eventId: Int): List<Market> {
+    return marketRepository.findByEventId(eventId)
+  }
 
-    @SchemaMapping(typeName = "Query", field = "listLiveMarkets")
-    fun listLiveMarkets(@Argument eventId: Int): List<Market> {
-        return marketRepository.findByEventIdAndIsLiveTrue(eventId)
-    }
+  @SchemaMapping(typeName = "Query", field = "listLiveMarkets")
+  fun listLiveMarkets(@Argument eventId: Int): List<Market> {
+    return marketRepository.findByEventIdAndIsLiveTrue(eventId)
+  }
 
-    @SchemaMapping(typeName = "Market", field = "options")
-    fun getMarketOptions(market: Market): List<MarketOption> {
-        val query = entityManager.createQuery(
-            "SELECT m FROM Market m JOIN FETCH m.options WHERE m.id = :id", Market::class.java
-        )
-        query.setParameter("id", market.id)
-        val resultList = query.resultList
-        return if (resultList.isEmpty()) emptyList() else resultList[0].options
-    }
+  @SchemaMapping(typeName = "Market", field = "options")
+  fun getMarketOptions(market: Market): List<MarketOption> {
+    val query = entityManager.createQuery(
+      "SELECT m FROM Market m JOIN FETCH m.options WHERE m.id = :id", Market::class.java
+    )
+    query.setParameter("id", market.id)
+    val resultList = query.resultList
+    return if (resultList.isEmpty()) emptyList() else resultList[0].options
+  }
 
-    @MutationMapping
-    fun createMarket(@Argument name: String, @Argument eventId: Int): Market {
-        val event = eventRepository.findById(eventId).orElse(null)
-        val market = Market(name = name, event = event, isLive = false, source = "internal")
-        marketRepository.save(market)
-        return market
-    }
+  @MutationMapping
+  fun createMarket(@Argument name: String, @Argument eventId: Int): Market {
+    val event = eventRepository.findById(eventId).orElse(null)
+    val market = Market(name = name, event = event, isLive = false, source = "internal")
+    marketRepository.save(market)
+    return market
+  }
 
-    @MutationMapping
-    fun createMarketOption(@Argument name: String, @Argument odds: Float, @Argument marketId: Int): MarketOption {
-        val market = marketRepository.findById(marketId).orElse(null)
-        val marketOption = MarketOption(name = name, odds = BigDecimal.valueOf(odds.toDouble()), market = market)
-        marketOptionRepository.save(marketOption)
-        return marketOption
-    }
+  @MutationMapping
+  fun createMarketOption(@Argument name: String, @Argument odds: Float, @Argument marketId: Int): MarketOption {
+    val market = marketRepository.findById(marketId).orElse(null)
+    val marketOption = MarketOption(name = name, odds = BigDecimal.valueOf(odds.toDouble()), market = market)
+    marketOptionRepository.save(marketOption)
+    return marketOption
+  }
 }
