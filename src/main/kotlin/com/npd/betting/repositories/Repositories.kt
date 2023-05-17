@@ -2,6 +2,7 @@ package com.npd.betting.repositories
 
 import com.npd.betting.model.*
 import org.springframework.data.jpa.repository.JpaRepository
+import java.sql.Timestamp
 
 // default methods in JPA repiositories
 // https://www.tutorialspoint.com/spring_boot_jpa/spring_boot_jpa_repository_methods.htm
@@ -31,7 +32,9 @@ interface MarketRepository : JpaRepository<Market, Int> {
 }
 
 
-interface MarketOptionRepository : JpaRepository<MarketOption, Int>
+interface MarketOptionRepository : JpaRepository<MarketOption, Int> {
+  fun findAllByLastUpdatedAfter(lastUpdated: Timestamp): List<MarketOption>
+}
 
 interface TransactionRepository : JpaRepository<Transaction, Int>
 

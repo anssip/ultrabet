@@ -152,9 +152,7 @@ enum TransactionType {
 }
 
 type Subscription {
-    liveEventUpdated(id: ID!): Event
-    liveMarketUpdated(id: ID!): Market
-    liveMarketOptionUpdated(id: ID!): MarketOption
+    liveMarketOptionUpdated: MarketOption
 }
 
 # Queries

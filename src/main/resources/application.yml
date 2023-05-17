@@ -18,15 +18,34 @@ spring:
           true
   graphql:
     path: /graphql
+    webSocket:
+      path: /subscriptions
+    schema:
+      printer:
+        enabled: true
     graphiql:
       enabled: true
       path: /graphiql
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
 logging:
   level:
+    reactor:
+      netty:
+        http: debug
     org:
+      springframework:
+        web: debug
+        http: debug
+        graphql: debug
       hibernate:
         SQL: ERROR
         type:
           descriptor:
             sql:
               BasicBinder: TRACE
+
+

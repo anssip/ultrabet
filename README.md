@@ -11,7 +11,8 @@
 - [x] Deploy somewhere
 - [ ] Pagination TBD when building the UI
 - [ ] add completedEvents query
-- [ ] database indexes
+- [ ] scheduled update of completed events. Canceled events are now left non-completed.
+- [ ] GraphQL subscriptions
 -
 
 ## Event import
