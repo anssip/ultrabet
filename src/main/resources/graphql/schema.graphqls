@@ -71,7 +71,6 @@ type Market {
     """
     lastUpdated: String
     name: String!
-    eventId: ID!
     event: Event
     options: [MarketOption]
 }
