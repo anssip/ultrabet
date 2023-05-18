@@ -29,17 +29,14 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+//  implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.0-RC") // Replace with the latest version
-
-
+//  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.0-RC") // Replace with the latest version
 
   implementation("io.ktor:ktor-client-core")
   implementation("io.ktor:ktor-client-cio")
   implementation("io.ktor:ktor-client-json")
   implementation("io.ktor:ktor-client-serialization")
-  implementation("io.ktor:ktor-client-logging")
   implementation("io.ktor:ktor-client-websockets")
   implementation("io.ktor:ktor-serialization-kotlinx-json")
   implementation("io.ktor:ktor-client-content-negotiation")
@@ -49,14 +46,12 @@ dependencies {
   implementation("com.graphql-java:graphiql-spring-boot-starter:3.0.3")
 
   runtimeOnly("com.mysql:mysql-connector-j")
-  testImplementation("org.springframework:spring-webflux")
+
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.graphql:spring-graphql-test")
   testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
   testImplementation("io.mockk:mockk:1.12.0")
   testImplementation("io.ktor:ktor-client-mock")
-
-
 }
 
 tasks {
