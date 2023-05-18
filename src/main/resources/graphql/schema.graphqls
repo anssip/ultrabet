@@ -88,7 +88,6 @@ type MarketOption {
     lastUpdated: String
     name: String!
     odds: Float!
-    marketId: ID!
     market: Market
 }
 
@@ -128,7 +127,6 @@ type Wallet {
 
 type Transaction {
     id: ID!
-    walletId: ID!
     wallet: Wallet
     amount: Float!
     transactionType: TransactionType!
