@@ -47,11 +47,11 @@ dependencies {
 
   runtimeOnly("com.mysql:mysql-connector-j")
 
-  testImplementation("org.springframework.boot:spring-boot-starter-test")
-  testImplementation("org.springframework.graphql:spring-graphql-test")
-  testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-  testImplementation("io.mockk:mockk:1.12.0")
-  testImplementation("io.ktor:ktor-client-mock")
+//  testImplementation("org.springframework.boot:spring-boot-starter-test")
+//  testImplementation("org.springframework.graphql:spring-graphql-test")
+//  testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+//  testImplementation("io.mockk:mockk:1.12.0")
+//  testImplementation("io.ktor:ktor-client-mock")
 }
 
 tasks {
