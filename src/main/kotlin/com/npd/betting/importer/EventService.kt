@@ -70,6 +70,7 @@ class EventService(
       )
     }
 
+    // save bookmakers --> odds
     if (eventData.bookmakers != null) {
       eventData.bookmakers!!.forEach { bookmaker ->
         bookmaker.markets.forEach { marketData ->
@@ -80,19 +81,46 @@ class EventService(
               println("Event ${event.id}, market ${marketData.key}, source: ${bookmaker.key} has been updated")
               entityManager.remove(existingMarket)
               entityManager.flush()
-              saveMarket(event, marketData, bookmaker)
+              updateMarket(event, existingMarket, marketData)
             } else {
               println("Market did not change")
             }
           } else {
-            saveMarket(event, marketData, bookmaker)
+            createMarket(event, marketData, bookmaker)
           }
         }
       }
     }
   }
 
-  private fun saveMarket(
+  private fun updateMarket(
+    event: Event,
+    existingMarket: Market,
+    marketData: MarketData,
+  ) {
+    existingMarket.isLive = event.isLive
+    existingMarket.lastUpdated = Timestamp(marketData.last_update * 1000)
+    marketRepository.save(existingMarket)
+
+    marketData.outcomes.forEach { marketOptionData ->
+      val existingMarketOption = marketOptionRepository.findByMarketIdAndName(existingMarket.id, marketOptionData.name)
+      if (existingMarketOption != null) {
+        existingMarketOption.odds = BigDecimal(marketOptionData.price)
+        existingMarketOption.lastUpdated = Timestamp(marketData.last_update * 1000)
+        marketOptionRepository.save(existingMarketOption)
+      } else {
+        val marketOption = MarketOption(
+          name = marketOptionData.name,
+          odds = BigDecimal(marketOptionData.price),
+          market = existingMarket,
+          lastUpdated = Timestamp(marketData.last_update * 1000)
+        )
+        marketOptionRepository.save(marketOption)
+      }
+    }
+  }
+
+  private fun createMarket(
     event: Event,
     marketData: MarketData,
     bookmaker: Bookmaker
@@ -110,7 +138,8 @@ class EventService(
       val marketOption = MarketOption(
         name = marketOptionData.name,
         odds = BigDecimal(marketOptionData.price),
-        market = savedMarket
+        market = savedMarket,
+        lastUpdated = Timestamp(marketData.last_update * 1000)
       )
       marketOptionRepository.save(marketOption)
     }

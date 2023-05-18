@@ -33,14 +33,14 @@ management:
         include: health,metrics,info
 logging:
   level:
-    reactor:
-      netty:
-        http: debug
+#    reactor:
+#      netty:
+#        http: debug
     org:
-      springframework:
-        web: debug
-        http: debug
-        graphql: debug
+#      springframework:
+#        web: debug
+#        http: debug
+#        graphql: debug
       hibernate:
         SQL: ERROR
         type:

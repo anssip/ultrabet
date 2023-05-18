@@ -70,19 +70,6 @@ class MarketController @Autowired constructor(
     return marketOption
   }
 
-
-//  fun liveMarketOptionUpdated(): Publisher<MarketOption> {
-//    // Set up an interval for polling the database.
-//    return Flux.interval(Duration.ofSeconds(1))
-//      .flatMap {
-//        // Fetch all MarketOptions updated since the last poll.
-//        marketOptionRepository.findAllByLastUpdatedAfter(lastPollTime).also {
-//          // Update the last poll time.
-//          lastPollTime = Timestamp.from(Instant.now())
-//        }
-//      }
-//  }
-
   @SubscriptionMapping
   fun liveMarketOptionUpdated(): Flux<MarketOption> {
     // Set up an interval for polling the database.

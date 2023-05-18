@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] GraphQL subscriptions
+- [x] Make it update market_option.last_updated_at
 - [x] Entities (for JPA)
 - [x] Repositories
 - [x] Queries
@@ -12,8 +14,6 @@
 - [ ] Pagination TBD when building the UI
 - [ ] add completedEvents query
 - [ ] scheduled update of completed events. Canceled events are now left non-completed.
-- [ ] GraphQL subscriptions
--
 
 ## Event import
 

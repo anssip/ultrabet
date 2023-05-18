@@ -145,10 +145,10 @@ data class Market(
   val id: Int = 0,
 
   @Column(name = "is_live", nullable = false)
-  val isLive: Boolean,
+  var isLive: Boolean,
 
   @Column(name = "last_updated")
-  val lastUpdated: Timestamp? = null,
+  var lastUpdated: Timestamp? = null,
 
   @Column(name = "name", nullable = false)
   val name: String,
@@ -172,13 +172,13 @@ data class MarketOption(
   val id: Int = 0,
 
   @Column(name = "last_updated")
-  val lastUpdated: Timestamp? = null,
+  var lastUpdated: Timestamp? = null,
 
   @Column(name = "name", nullable = false)
   val name: String,
 
   @Column(name = "odds", nullable = false)
-  val odds: BigDecimal,
+  var odds: BigDecimal,
 
   @ManyToOne
   @JoinColumn(name = "market_id")
