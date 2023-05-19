@@ -20,8 +20,8 @@ spring:
     path: /graphql
     cors:
       allow-credentials: true
-      allowed-origins: *
-      allowed-methods: *
+      allowed-origins: '*'
+      allowed-methods: '*'
     webSocket:
       path: /subscriptions
     schema:
