@@ -85,7 +85,7 @@ class EventService(
         bookmaker.markets.forEach { marketData ->
           val existingMarket = marketRepository.findByEventIdAndSourceAndName(event.id, bookmaker.key, marketData.key)
           if (existingMarket != null) {
-            if (existingMarket.lastUpdated!!.time > marketData.last_update * 1000) {
+            if (existingMarket.lastUpdated!!.time < marketData.last_update * 1000) {
               // update market
               logger.info("Event ${event.id}, market ${marketData.key}, source: ${bookmaker.key} has been updated")
               entityManager.remove(existingMarket)
