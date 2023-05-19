@@ -7,6 +7,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -71,6 +73,8 @@ data class MarketOptionData(
 
 @Component
 class EventImporter(private val service: EventService) {
+  val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
+
   companion object {
     const val API_KEY = "fb2a903bfc8c151b2bd88f3ebd16dd99"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
@@ -89,11 +93,11 @@ class EventImporter(private val service: EventService) {
 
   suspend fun doImport() {
     val sports = this.fetchSports()
-    println("Importing ${sports.size} sports")
+    logger.debug("Importing ${sports.size} sports")
     service.importSports(sports)
 
     val events = this.fetchEvents()
-    println("Importing ${events.size} events")
+    logger.debug("Importing ${events.size} events")
     service.importEvents(events)
   }
 

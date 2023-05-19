@@ -6,7 +6,7 @@ spring:
     username: ${DB_USERNAME:betadmin}
     password: ${DB_PASSWORD:asdf123_}
     hikari:
-      maximum-pool-size=8
+      maximum-pool-size=6
       minimum-idle=4
   jpa:
     hibernate:
@@ -35,15 +35,19 @@ management:
       exposure:
         include: health,metrics,info
 logging:
+  root: INFO
   level:
+    com:
+      npd:
+        betting: info
     reactor:
       netty:
-        http: debug
+        http: error
     org:
       springframework:
-        web: debug
-        http: debug
-        graphql: debug
+        web: error
+        http: error
+        graphql: error
       hibernate:
         SQL: ERROR
         type:

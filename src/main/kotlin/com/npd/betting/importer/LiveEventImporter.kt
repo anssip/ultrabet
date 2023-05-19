@@ -9,12 +9,16 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
 class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
+  val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
+
   fun getEventApiURL(sport: String, eventId: String): String {
     return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=uk,us,us2,eu,au&bookmakers=bet365,unibet_eu,betfair,betclic&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
   }
@@ -33,10 +37,10 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
 
   suspend fun importLiveEvents() {
     val liveEvents = eventRepository.findByIsLiveTrueAndCompletedFalse()
-    println("Found ${liveEvents.size} live events")
+    logger.debug("Found ${liveEvents.size} live events")
 
     val eventData = fetchEvents(liveEvents)
-    println("Fetched ${eventData.size} events from bets-api.com")
+    logger.debug("Fetched ${eventData.size} events from bets-api.com")
 
     val notfound = eventData.mapNotNull { it.second }
     notfound.forEach() {
@@ -44,7 +48,7 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     }
 
     val sports = eventData.mapNotNull { it.first?.sport_key }.distinct()
-    println("Fetching scores for $sports sports")
+    logger.debug("Fetching scores for $sports sports")
     sports.forEach() {
       val eventsWithScores = fetchScores(it)
       if (eventsWithScores.isNotEmpty()) {
@@ -64,13 +68,13 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
 
   suspend fun fetchEvents(events: List<Event>): List<Pair<EventData?, Int?>> {
     val data = events.map() {
-      println("Fetching odds for event ${it.externalId} and sport ${it.sport.key}")
+      logger.debug("Fetching odds for event ${it.externalId} and sport ${it.sport.key}")
       val response: HttpResponse =
         httpClient.request(getEventApiURL(it.sport.key, it.externalId!!)) {
           method = HttpMethod.Get
         }
       if (response.status != HttpStatusCode.OK) {
-        println("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
+        logger.error("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
         //throw IllegalStateException("Failed to fetch events: response.status: ${response.status}: ${response.bodyAsText()}")
         Pair(null, it.id)
       } else {

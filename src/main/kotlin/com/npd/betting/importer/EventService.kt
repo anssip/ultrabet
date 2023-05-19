@@ -3,6 +3,8 @@ package com.npd.betting.importer
 import com.npd.betting.model.*
 import com.npd.betting.repositories.*
 import jakarta.persistence.EntityManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.sql.Timestamp
@@ -17,12 +19,19 @@ class EventService(
   private val sportRepository: SportRepository,
   private val entityManager: EntityManager
 ) {
+  val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
+
   suspend fun importEvents(eventsData: List<EventData>) {
     eventsData.forEach { eventData ->
       val existing = eventRepository.findByExternalId(eventData.id)
       if (existing != null) {
-        println("event commence time: ${Date(eventData.commence_time * 1000)}, current time: ${Date()}, is live based on time? ${eventData.isLive()}")
-        println("eventData.completed: ${eventData.completed}")
+        logger.debug(
+          "event commence time: {}, current time: {}, is live based on time? {}",
+          Date(eventData.commence_time * 1000),
+          Date(),
+          eventData.isLive()
+        )
+        logger.debug("eventData.completed: ${eventData.completed}")
 
         if (existing.isLive != eventData.isLive() || existing.completed != eventData.completed) {
           println("Event ${eventData.id} is now ${if (eventData.isLive()) "live" else "not live"}")
@@ -30,7 +39,7 @@ class EventService(
           existing.completed = eventData.completed ?: existing.completed
           eventRepository.save(existing)
         } else {
-          println("Event ${eventData.id} already exists, skipping...")
+          logger.debug("Event ${eventData.id} already exists, skipping...")
         }
       } else {
         saveEventAndOdds(eventData)
@@ -78,12 +87,12 @@ class EventService(
           if (existingMarket != null) {
             if (existingMarket.lastUpdated!!.time > marketData.last_update * 1000) {
               // update market
-              println("Event ${event.id}, market ${marketData.key}, source: ${bookmaker.key} has been updated")
+              logger.info("Event ${event.id}, market ${marketData.key}, source: ${bookmaker.key} has been updated")
               entityManager.remove(existingMarket)
               entityManager.flush()
               updateMarket(event, existingMarket, marketData)
             } else {
-              println("Market did not change")
+              logger.debug("Market did not change")
             }
           } else {
             createMarket(event, marketData, bookmaker)
@@ -160,7 +169,7 @@ class EventService(
             // we don't have this score yet, create it
             scoreUpdateRepository.save(score)
           } else {
-            println("Score ${scoreData.name} ${scoreData.score} already exists, skipping...")
+            logger.debug("Score ${scoreData.name} ${scoreData.score} already exists, skipping...")
           }
         } else {
           // no existing scores
@@ -174,7 +183,7 @@ class EventService(
     sports.forEach() { sportData ->
       val existing = sportRepository.findByKey(sportData.key)
       if (existing != null) {
-        println("Sport ${sportData.key} already exists, updating active value...")
+        logger.debug("Sport ${sportData.key} already exists, updating active value...")
         existing.active = sportData.active
         sportRepository.save(existing)
       } else {
@@ -196,7 +205,7 @@ class EventService(
   fun updateCompleted(eventId: Int) {
     val event = eventRepository.findById(eventId).get()
     event.completed = event.startTime.before(Date())
-    println("Updating event ${event.id} completed to ${event.completed}")
+    logger.info("Updating event ${event.id} completed to ${event.completed}")
     eventRepository.save(event)
   }
 }
