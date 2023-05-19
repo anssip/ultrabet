@@ -18,6 +18,10 @@ spring:
           true
   graphql:
     path: /graphql
+    cors:
+      allow-credentials: true
+      allowed-origins:
+        - http://localhost:3000
     webSocket:
       path: /subscriptions
     schema:
