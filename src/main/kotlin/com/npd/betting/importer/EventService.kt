@@ -88,8 +88,6 @@ class EventService(
             if (existingMarket.lastUpdated!!.time < marketData.last_update * 1000) {
               // update market
               logger.info("Event ${event.id}, market ${marketData.key}, source: ${bookmaker.key} has been updated")
-              entityManager.remove(existingMarket)
-              entityManager.flush()
               updateMarket(event, existingMarket, marketData)
             } else {
               logger.debug("Market did not change")
@@ -109,23 +107,17 @@ class EventService(
   ) {
     existingMarket.isLive = event.isLive
     existingMarket.lastUpdated = Timestamp(marketData.last_update * 1000)
-    marketRepository.save(existingMarket)
 
     marketData.outcomes.forEach { marketOptionData ->
-      val existingMarketOption = marketOptionRepository.findByMarketIdAndName(existingMarket.id, marketOptionData.name)
+      val existingMarketOption = existingMarket.options.find { it.name == marketOptionData.name }
+
       if (existingMarketOption != null) {
         existingMarketOption.odds = BigDecimal(marketOptionData.price)
         existingMarketOption.lastUpdated = Timestamp(marketData.last_update * 1000)
-        marketOptionRepository.save(existingMarketOption)
       } else {
-        val marketOption = MarketOption(
-          name = marketOptionData.name,
-          odds = BigDecimal(marketOptionData.price),
-          market = existingMarket,
-          lastUpdated = Timestamp(marketData.last_update * 1000)
-        )
-        marketOptionRepository.save(marketOption)
+        // is this a valid case?
       }
+      marketRepository.save(existingMarket)
     }
   }
 

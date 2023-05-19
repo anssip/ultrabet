@@ -34,7 +34,7 @@ interface MarketRepository : JpaRepository<Market, Int> {
 
 interface MarketOptionRepository : JpaRepository<MarketOption, Int> {
   fun findAllByLastUpdatedAfter(lastUpdated: Timestamp): List<MarketOption>
-  fun findByMarketIdAndName(marketId: Int, name: String): MarketOption?
+  fun findByMarketId(marketId: Int): List<MarketOption>
 }
 
 interface TransactionRepository : JpaRepository<Transaction, Int>
