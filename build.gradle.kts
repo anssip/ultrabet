@@ -37,10 +37,10 @@ dependencies {
   implementation("io.ktor:ktor-client-cio")
   implementation("io.ktor:ktor-client-json")
   implementation("io.ktor:ktor-client-serialization")
-  implementation("io.ktor:ktor-client-websockets")
+  //implementation("io.ktor:ktor-client-websockets")
   implementation("io.ktor:ktor-serialization-kotlinx-json")
   implementation("io.ktor:ktor-client-content-negotiation")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+  //implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
   implementation("com.graphql-java:graphql-java-extended-scalars:20.0")
   implementation("com.graphql-java:graphiql-spring-boot-starter:3.0.3")
