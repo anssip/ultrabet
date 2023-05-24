@@ -13,12 +13,8 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
+import reactor.core.publisher.Sinks
 import java.math.BigDecimal
-import java.sql.Timestamp
-import java.time.Duration
-import java.time.Instant
 
 @Controller
 class MarketController @Autowired constructor(
@@ -26,8 +22,8 @@ class MarketController @Autowired constructor(
   private val marketOptionRepository: MarketOptionRepository,
   private val eventRepository: EventRepository,
   private val entityManager: EntityManager,
+  private val marketOptionSink: Sinks.Many<MarketOption>
 ) {
-  private var lastPollTime: Timestamp = Timestamp.from(Instant.now())
 
   @SchemaMapping(typeName = "Query", field = "getMarket")
   fun getMarket(@Argument id: Int): Market {
@@ -72,24 +68,7 @@ class MarketController @Autowired constructor(
 
   @SubscriptionMapping
   fun liveMarketOptionUpdated(): Flux<MarketOption> {
-    // Set up an interval for polling the database.
-    return Flux.interval(Duration.ofSeconds(1))
-      .flatMap {
-        Mono.fromCallable {
-//          println("Polling for updated market options updated after $lastPollTime")
-          val updated = marketOptionRepository.findAllByLastUpdatedAfter(Timestamp(lastPollTime.time))
-//          if (updated.size > 0) {
-//            println("Found ${updated.size} updated market options!!!!")
-//          }
-          updated
-        }
-          .subscribeOn(Schedulers.boundedElastic())
-          .flatMapIterable { it } // transform the list to a Flux stream
-      }
-      .doOnNext {
-        // Update the last poll time.
-        lastPollTime = Timestamp.from(Instant.now())
-      }
+    return marketOptionSink.asFlux()
   }
 
 }

@@ -44,6 +44,7 @@ dependencies {
 
   implementation("com.graphql-java:graphql-java-extended-scalars:20.0")
   implementation("com.graphql-java:graphiql-spring-boot-starter:3.0.3")
+  implementation("com.graphql-java:graphql-spring-boot-starter:5.0.2")
 
   runtimeOnly("com.mysql:mysql-connector-j")
 
