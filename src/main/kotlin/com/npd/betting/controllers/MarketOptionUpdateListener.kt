@@ -15,7 +15,7 @@ class MarketOptionUpdateListener(private val marketOptionSink: Sinks.Many<Market
 
   override fun onApplicationEvent(event: MarketOptionUpdatedEvent) {
     val updatedMarketOptions = event.getUpdatedMarketOptions()
-    logger.debug("Received ${updatedMarketOptions.size} updated market options")
+    logger.info("Received ${updatedMarketOptions.size} updated market options")
     // Push the updated market options to the subscription clients
     updatedMarketOptions.forEach { marketOption ->
       marketOptionSink.emitNext(marketOption, Sinks.EmitFailureHandler.FAIL_FAST)

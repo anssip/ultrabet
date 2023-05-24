@@ -1,21 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.gradle.api.tasks.Delete
-import org.gradle.api.file.FileTree
 
-tasks.register("stage", Delete::class) {
-  dependsOn("build")
-
-  doLast {
-    val dir = fileTree("build") {
-      exclude("libs")
-    }
-    delete(dir)
-    val libsDir = fileTree("build/libs") {
-      exclude("*.jar")
-    }
-    delete(libsDir)
-  }
-}
 
 plugins {
   kotlin("jvm") version "1.7.22"
@@ -26,10 +10,18 @@ plugins {
   id("io.ktor.plugin") version "2.3.0"
   kotlin("plugin.serialization") version "1.5.0"
   id("com.github.johnrengelman.shadow") version "7.1.2"
+  id("com.heroku.sdk.heroku-gradle") version "3.0.0"
   id("application")
 }
 application {
   mainClass.set("com.npd.betting.BettingGraphqlApi")
+}
+
+heroku {
+  appName = "ultrabet-api"
+  includes = listOf("./build/libs/ultrabet-0.0.1-SNAPSHOT.jar")
+  isIncludeBuildDir = false
+  jdkVersion = "17"
 }
 
 group = "com.npd.betting"
@@ -38,6 +30,8 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
   mavenCentral()
+  gradlePluginPortal()
+  maven(url = "https://plugins.gradle.org/m2/")
 }
 
 dependencies {
