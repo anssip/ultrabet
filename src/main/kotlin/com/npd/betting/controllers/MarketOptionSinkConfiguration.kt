@@ -10,6 +10,7 @@ import reactor.core.publisher.Sinks
 class MarketOptionSinkConfiguration {
   @Bean
   fun marketOptionSink(): Sinks.Many<MarketOption> {
-    return Sinks.many().multicast().onBackpressureBuffer<MarketOption>()
+    return Sinks.many().multicast().directBestEffort<MarketOption>()
+//    return Sinks.many().multicast().onBackpressureBuffer<MarketOption>(10, true)
   }
 }

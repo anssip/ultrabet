@@ -4,8 +4,8 @@ import com.npd.betting.model.*
 import com.npd.betting.repositories.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Sinks
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.util.*
@@ -17,7 +17,7 @@ class EventService(
   private val marketOptionRepository: MarketOptionRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
   private val sportRepository: SportRepository,
-  private val applicationEventPublisher: ApplicationEventPublisher
+  private val marketOptionSink: Sinks.Many<MarketOption>
 ) {
   val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
 
@@ -108,21 +108,20 @@ class EventService(
     existingMarket.isLive = event.isLive
     existingMarket.lastUpdated = Timestamp(marketData.last_update * 1000)
 
-    val updatedMarketOptions = ArrayList<MarketOption>()
     marketData.outcomes.forEach { marketOptionData ->
       val existingMarketOption = existingMarket.options.find { it.name == marketOptionData.name }
 
       if (existingMarketOption != null && existingMarketOption.odds != BigDecimal(marketOptionData.price)) {
         existingMarketOption.odds = BigDecimal(marketOptionData.price)
         existingMarketOption.lastUpdated = Timestamp(marketData.last_update * 1000)
-        updatedMarketOptions.add(existingMarketOption)
+
+        if (marketOptionSink.currentSubscriberCount() > 0 && marketOptionSink.tryEmitNext(existingMarketOption) == Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER) {
+          logger.info("No listeners when emitting to the sink")
+        }
       } else {
         // is this a valid case?
       }
       marketRepository.save(existingMarket)
-    }
-    if (updatedMarketOptions.isNotEmpty()) {
-      applicationEventPublisher.publishEvent(MarketOptionUpdatedEvent(this, updatedMarketOptions))
     }
   }
 
