@@ -13,7 +13,6 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Sinks
 import java.math.BigDecimal
 
 @Controller
@@ -22,7 +21,7 @@ class MarketController @Autowired constructor(
   private val marketOptionRepository: MarketOptionRepository,
   private val eventRepository: EventRepository,
   private val entityManager: EntityManager,
-  private val marketOptionSink: Sinks.Many<MarketOption>
+  private val marketOptionSink: AccumulatingSink<MarketOption>
 ) {
 
   @SchemaMapping(typeName = "Query", field = "getMarket")
@@ -67,7 +66,7 @@ class MarketController @Autowired constructor(
   }
 
   @SubscriptionMapping
-  fun liveMarketOptionUpdated(): Flux<MarketOption> {
+  fun liveMarketOptionsUpdated(): Flux<List<MarketOption>> {
     return marketOptionSink.asFlux()
   }
 

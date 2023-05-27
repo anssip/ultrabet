@@ -1,11 +1,11 @@
 package com.npd.betting.importer
 
+import com.npd.betting.controllers.AccumulatingSink
 import com.npd.betting.model.*
 import com.npd.betting.repositories.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Sinks
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.util.*
@@ -17,7 +17,7 @@ class EventService(
   private val marketOptionRepository: MarketOptionRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
   private val sportRepository: SportRepository,
-  private val marketOptionSink: Sinks.Many<MarketOption>
+  private val marketOptionSink: AccumulatingSink<MarketOption>
 ) {
   val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
 
@@ -115,9 +115,7 @@ class EventService(
         existingMarketOption.odds = BigDecimal(marketOptionData.price)
         existingMarketOption.lastUpdated = Timestamp(marketData.last_update * 1000)
 
-        if (marketOptionSink.currentSubscriberCount() > 0 && marketOptionSink.tryEmitNext(existingMarketOption) == Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER) {
-          logger.info("No listeners when emitting to the sink")
-        }
+        marketOptionSink.emit(existingMarketOption)
       } else {
         // is this a valid case?
       }
@@ -176,7 +174,7 @@ class EventService(
   }
 
   fun importSports(sports: List<SportData>) {
-    sports.forEach() { sportData ->
+    sports.forEach { sportData ->
       val existing = sportRepository.findByKey(sportData.key)
       if (existing != null) {
         logger.debug("Sport ${sportData.key} already exists, updating active value...")
