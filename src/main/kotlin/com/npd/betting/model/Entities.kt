@@ -105,7 +105,7 @@ data class Event(
   val markets: List<Market> = emptyList(),
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
-  val scoreUpdates: List<ScoreUpdate> = emptyList()
+  val scoreUpdates: MutableList<ScoreUpdate> = mutableListOf()
 )
 
 @Entity

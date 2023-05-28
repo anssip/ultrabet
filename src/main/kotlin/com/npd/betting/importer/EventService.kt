@@ -17,7 +17,9 @@ class EventService(
   private val marketOptionRepository: MarketOptionRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
   private val sportRepository: SportRepository,
-  private val marketOptionSink: AccumulatingSink<MarketOption>
+  private val marketOptionSink: AccumulatingSink<MarketOption>,
+  private val scoreUpdatesSink: AccumulatingSink<Event>,
+  private val eventStatusUpdatesSink: AccumulatingSink<Event>
 ) {
   val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
 
@@ -38,6 +40,7 @@ class EventService(
           existing.isLive = eventData.isLive()
           existing.completed = eventData.completed ?: existing.completed
           eventRepository.save(existing)
+          eventStatusUpdatesSink.emit(existing)
         } else {
           logger.debug("Event ${eventData.id} already exists, skipping...")
         }
@@ -161,7 +164,10 @@ class EventService(
         if (existingScores.isNotEmpty()) {
           if (existingScores.find { it.name == scoreData.name && it.score == scoreData.score } == null) {
             // we don't have this score yet, create it
-            scoreUpdateRepository.save(score)
+            logger.info("Event ${event.id}, has new score ${scoreData.name} ${scoreData.score}")
+            event.scoreUpdates.add(score)
+            eventRepository.save(event)
+            scoreUpdatesSink.emit(event)
           } else {
             logger.debug("Score ${scoreData.name} ${scoreData.score} already exists, skipping...")
           }
@@ -201,5 +207,6 @@ class EventService(
     event.completed = event.startTime.before(Date())
     logger.info("Updating event ${event.id} completed to ${event.completed}")
     eventRepository.save(event)
+    eventStatusUpdatesSink.emit(event)
   }
 }

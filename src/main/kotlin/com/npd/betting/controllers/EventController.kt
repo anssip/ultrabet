@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
+import reactor.core.publisher.Flux
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -18,7 +20,8 @@ import java.time.LocalDateTime
 class EventController @Autowired constructor(
   private val eventRepository: EventRepository,
   private val sportRepository: SportRepository,
-  private val entityManager: EntityManager
+  private val entityManager: EntityManager,
+  private val scoreUpdatesSink: AccumulatingSink<Event>
 ) {
 
   @SchemaMapping(typeName = "Query", field = "getEvent")
@@ -73,5 +76,10 @@ class EventController @Autowired constructor(
     )
     eventRepository.save(event)
     return event
+  }
+
+  @SubscriptionMapping
+  fun eventScoresUpdated(): Flux<List<Event>> {
+    return scoreUpdatesSink.asFlux()
   }
 }
