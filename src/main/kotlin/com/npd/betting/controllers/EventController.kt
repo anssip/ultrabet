@@ -21,7 +21,8 @@ class EventController @Autowired constructor(
   private val eventRepository: EventRepository,
   private val sportRepository: SportRepository,
   private val entityManager: EntityManager,
-  private val scoreUpdatesSink: AccumulatingSink<Event>
+  private val scoreUpdatesSink: AccumulatingSink<Event>,
+  private val eventStatusUpdatesSink: AccumulatingSink<Event>
 ) {
 
   @SchemaMapping(typeName = "Query", field = "getEvent")
@@ -41,7 +42,7 @@ class EventController @Autowired constructor(
 
   @SchemaMapping(typeName = "Event", field = "markets")
   fun getEventMarkets(event: Event, @Argument("source") source: String?): List<Market> {
-    val sourceClause = if (source != null) "AND m.source = :source" else "";
+    val sourceClause = if (source != null) "AND m.source = :source" else ""
     val query = entityManager.createQuery(
       "SELECT e FROM Event e JOIN FETCH e.markets m WHERE e.id = :id $sourceClause", Event::class.java
     )
@@ -65,9 +66,17 @@ class EventController @Autowired constructor(
   }
 
   @MutationMapping
-  fun createEvent(@Argument name: String, @Argument startTime: String, @Argument sport: String): Event {
+  fun createEvent(
+    @Argument homeTeamName: String,
+    @Argument awayTeamName: String,
+    @Argument name: String,
+    @Argument startTime: String,
+    @Argument sport: String
+  ): Event {
     val sportEntity = sportRepository.findByKey(sport) ?: throw Exception("Sport with key $sport does not exist")
     val event = Event(
+      homeTeamName = homeTeamName,
+      awayTeamName = awayTeamName,
       name = name,
       startTime = Timestamp.valueOf(LocalDateTime.parse(startTime)),
       sport = sportEntity,
@@ -81,5 +90,10 @@ class EventController @Autowired constructor(
   @SubscriptionMapping
   fun eventScoresUpdated(): Flux<List<Event>> {
     return scoreUpdatesSink.asFlux()
+  }
+
+  @SubscriptionMapping
+  fun eventStatusUpdated(): Flux<List<Event>> {
+    return eventStatusUpdatesSink.asFlux()
   }
 }

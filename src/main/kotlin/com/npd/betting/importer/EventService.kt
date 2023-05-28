@@ -36,11 +36,11 @@ class EventService(
         logger.debug("eventData.completed: ${eventData.completed}")
 
         if (existing.isLive != eventData.isLive() || existing.completed != eventData.completed) {
-          println("Event ${eventData.id} is now ${if (eventData.isLive()) "live" else "not live"}")
           existing.isLive = eventData.isLive()
           existing.completed = eventData.completed ?: existing.completed
-          eventRepository.save(existing)
-          eventStatusUpdatesSink.emit(existing)
+          val saved = eventRepository.save(existing)
+          println("Event ${saved.id} is now ${if (saved.isLive) "live" else "not live"}. Emitting...")
+          eventStatusUpdatesSink.emit(saved)
         } else {
           logger.debug("Event ${eventData.id} already exists, skipping...")
         }
@@ -60,6 +60,9 @@ class EventService(
         ?: throw Exception("Event ${eventData.id} does not exist")
       existing.isLive = eventData.isLive()
       existing.completed = eventData.completed ?: existing.completed
+      existing.homeTeamName = eventData.home_team
+      existing.awayTeamName = eventData.away_team
+
       eventRepository.save(
         existing
       )
@@ -72,7 +75,9 @@ class EventService(
         name = "${eventData.home_team} vs ${eventData.away_team}",
         startTime = Timestamp(eventData.commence_time * 1000),
         sport = sportEntity,
-        externalId = eventData.id
+        externalId = eventData.id,
+        homeTeamName = eventData.home_team,
+        awayTeamName = eventData.away_team,
       )
       if (eventData.completed != null) {
         newEvent.completed = eventData.completed ?: newEvent.completed
@@ -166,8 +171,8 @@ class EventService(
             // we don't have this score yet, create it
             logger.info("Event ${event.id}, has new score ${scoreData.name} ${scoreData.score}")
             event.scoreUpdates.add(score)
-            eventRepository.save(event)
-            scoreUpdatesSink.emit(event)
+            val saved: Event = eventRepository.save(event)
+            scoreUpdatesSink.emit(saved)
           } else {
             logger.debug("Score ${scoreData.name} ${scoreData.score} already exists, skipping...")
           }
@@ -203,7 +208,7 @@ class EventService(
   }
 
   fun updateCompleted(eventId: Int) {
-    val event = eventRepository.findById(eventId).get()
+    val event: Event = eventRepository.findById(eventId).get()
     event.completed = event.startTime.before(Date())
     logger.info("Updating event ${event.id} completed to ${event.completed}")
     eventRepository.save(event)

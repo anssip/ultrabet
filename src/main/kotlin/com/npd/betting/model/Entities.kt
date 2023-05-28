@@ -94,6 +94,12 @@ data class Event(
   @Column(name = "name", nullable = false)
   val name: String,
 
+  @Column(name = "homeTeamName", nullable = false)
+  var homeTeamName: String,
+
+  @Column(name = "awayTeamName", nullable = false)
+  var awayTeamName: String,
+
   @Column(name = "start_time", nullable = false)
   val startTime: Timestamp,
 

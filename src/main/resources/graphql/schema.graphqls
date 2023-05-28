@@ -27,6 +27,8 @@ type Event {
     """
     completed: Boolean!
     name: String!
+    homeTeamName: String!
+    awayTeamName: String!
     startTime: String!
     sport: Sport!
     markets(source: String): [Market]
@@ -150,8 +152,8 @@ enum TransactionType {
 
 type Subscription {
     liveMarketOptionsUpdated: [MarketOption]
-    eventScoresUpdated: Event
-    eventStatusUpdates: Event
+    eventScoresUpdated: [Event]
+    eventStatusUpdated: [Event]
 }
 
 # Queries
