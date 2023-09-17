@@ -9,20 +9,20 @@ import org.springframework.stereotype.Controller
 @SpringBootApplication
 @EnableScheduling
 class BettingGraphqlApi {
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            runApplication<BettingGraphqlApi>(*args)
-        }
+  companion object {
+    @JvmStatic
+    fun main(args: Array<String>) {
+      runApplication<BettingGraphqlApi>(*args)
     }
+  }
 }
 
 
 @Controller
 class FooController {
-    @QueryMapping
-    fun hello(): String {
-        return "hello world"
-    }
+  @QueryMapping
+  fun hello(): String {
+    return "hello world"
+  }
 
 }

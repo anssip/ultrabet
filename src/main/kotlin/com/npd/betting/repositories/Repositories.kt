@@ -2,6 +2,7 @@ package com.npd.betting.repositories
 
 import com.npd.betting.model.*
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 import java.sql.Timestamp
 
 // default methods in JPA repiositories
@@ -17,6 +18,7 @@ interface BetRepository : JpaRepository<Bet, Int> {
   fun findByUserId(userId: Int): List<Bet>
 }
 
+@Repository
 interface EventRepository : JpaRepository<Event, Int> {
   fun findByIsLiveTrueAndCompletedFalse(): List<Event>
   fun findByIsLiveFalseAndCompletedFalse(): List<Event>

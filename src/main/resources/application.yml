@@ -35,24 +35,27 @@ management:
       exposure:
         include: health,metrics,info
 logging:
-  root: INFO
+  root: DEBUG
   level:
     com:
       npd:
         betting: info
+      mysql:
+        cj: info
     reactor:
       netty:
         http: error
     org:
       springframework:
-        web: error
+        web: DEBUG
         http: error
         graphql: error
+        jpa: info
       hibernate:
-        SQL: ERROR
+        SQL: info
         type:
           descriptor:
             sql:
-              BasicBinder: TRACE
+              BasicBinder: info
 
 

@@ -58,6 +58,7 @@ class EventService(
     val event = if (update) {
       val existing = eventRepository.findByExternalId(eventData.id)
         ?: throw Exception("Event ${eventData.id} does not exist")
+      logger.info("Updating event ${eventData.id}: ${eventData.home_team} vs ${eventData.away_team}")
       existing.isLive = eventData.isLive()
       existing.completed = eventData.completed ?: existing.completed
       existing.homeTeamName = eventData.home_team
@@ -70,6 +71,7 @@ class EventService(
       val sportEntity = sportRepository.findByKey(eventData.sport_key)
         ?: throw Exception("Sport with key ${eventData.sport_key} does not exist")
 
+      logger.info("Creating event ${eventData.id}: ${eventData.home_team} vs ${eventData.away_team}")
       val newEvent = Event(
         isLive = eventData.isLive(),
         name = "${eventData.home_team} vs ${eventData.away_team}",
