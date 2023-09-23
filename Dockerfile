@@ -7,7 +7,8 @@ COPY . /home/gradle/src
 WORKDIR /home/gradle/src
 
 # Build the project and dependencies
-RUN ./gradlew clean build bootJar --no-daemon
+#RUN ./gradlew clean build bootJar --no-daemon
+RUN ./gradlew clean build bootJar --no-daemon && ls -la build/libs
 
 
 # After building run the thing
