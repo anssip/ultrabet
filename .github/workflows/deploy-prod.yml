@@ -4,7 +4,7 @@ name: Deploy Production
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
+  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches:
       - main
@@ -18,8 +18,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "develop-build"
-  develop-build:
+  # This workflow contains a single job called "production-build"
+  production-build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -73,5 +73,5 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.render-container.outputs.task-definition }}
-          service: ultrabet-service-prod
+          service: ultrabet-service-2
           cluster: ultrabet-cluster-prod
