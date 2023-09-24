@@ -72,6 +72,6 @@ jobs:
       - name: Deploy to Amazon ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.render-web-container.outputs.task-definition }}
+          task-definition: ${{ steps.render-container.outputs.task-definition }}
           service: ultrabet-service-prod
           cluster: ultrabet-cluster-prod
