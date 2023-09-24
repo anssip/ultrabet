@@ -49,7 +49,7 @@ jobs:
           ECR_REPOSITORY: ultrabet
           IMAGE_TAG: latest
         run: |
-          docker build --progress=plain -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . > build.log 2>&1 || (cat build.log && exit 1)
+          docker build --progress=plain -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
