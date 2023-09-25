@@ -79,11 +79,11 @@ class EventImporter(private val service: EventService) {
     const val API_KEY = "e0f4fe902a9673daf7a78104feb2523e"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
     const val EVENTS_URL =
-      "$API_BASE/sports/upcoming/odds/?regions=eu&markets=h2h&bookmakers=bet365,betfair&dateFormat=unix&apiKey=$API_KEY"
+      "$API_BASE/sports/upcoming/odds/?regions=uk,us,us2,eu,au&markets=h2h&bookmakers=bet365,betfair&dateFormat=unix&apiKey=$API_KEY"
     const val SPORTS_URL = "$API_BASE/sports/?apiKey=$API_KEY"
   }
 
-  @Scheduled(fixedRate = 60000) // Poll the API every minute (60000 milliseconds)
+  @Scheduled(fixedRate = 5 * 60000) // Poll the API every 10 minutes
   @Transactional
   fun importEvents() {
     runBlocking {
