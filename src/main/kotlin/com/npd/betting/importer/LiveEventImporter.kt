@@ -20,7 +20,7 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
   val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
 
   fun getEventApiURL(sport: String, eventId: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&regions=uk,us,us2,eu,au&bookmakers=bet365,betfair&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&bookmakers=bet365,betfair,unibet_eu,betclic&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
   }
 
   fun getScoresApiURL(sport: String): String {
