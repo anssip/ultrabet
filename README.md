@@ -2,6 +2,8 @@
 
 Demo betting frontend: https://ultrabet-ui.vercel.app
 
+The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssip/ultrabet-ui)
+
 # TODO
 
 - [x] GraphQL subscriptions
