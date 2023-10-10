@@ -83,7 +83,7 @@ class EventImporter(private val service: EventService) {
     const val SPORTS_URL = "$API_BASE/sports/?apiKey=$API_KEY"
   }
 
-  @Scheduled(fixedRate = 5 * 60000) // Poll the API every 10 minutes
+  @Scheduled(fixedRate = 5 * 60000) // Poll the API every 5 minutes
   @Transactional
   fun importEvents() {
     runBlocking {
