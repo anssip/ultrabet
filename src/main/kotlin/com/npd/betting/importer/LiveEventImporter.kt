@@ -24,10 +24,10 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
   }
 
   fun getScoresApiURL(sport: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=h2h&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=${EventImporter.MARKETS}&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
   }
 
-  @Scheduled(fixedDelay = 30000)
+  @Scheduled(fixedDelay = 60, timeUnit = java.util.concurrent.TimeUnit.SECONDS)
   @Transactional
   fun import() {
     runBlocking {
