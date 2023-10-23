@@ -3,6 +3,13 @@ package com.npd.betting.importer
 import com.npd.betting.controllers.AccumulatingSink
 import com.npd.betting.model.*
 import com.npd.betting.repositories.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,9 +26,13 @@ class EventService(
   private val sportRepository: SportRepository,
   private val marketOptionSink: AccumulatingSink<MarketOption>,
   private val scoreUpdatesSink: AccumulatingSink<Event>,
-  private val eventStatusUpdatesSink: AccumulatingSink<Event>
+  private val eventStatusUpdatesSink: AccumulatingSink<Event>,
 ) {
   val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
+
+  fun getScoresApiURL(sport: String): String {
+    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=${EventImporter.MARKETS}&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
+  }
 
   suspend fun importEvents(eventsData: List<EventData>) {
     eventsData.forEach { eventData ->
@@ -50,13 +61,15 @@ class EventService(
     }
   }
 
-  fun saveEventAndOdds(
+  suspend fun saveEventAndOdds(
     eventData: EventData,
     update: Boolean = false
   ) {
 
     val event = if (update) {
-      val existing = eventRepository.findByExternalId(eventData.id)
+      val existing = withContext(Dispatchers.IO) {
+        eventRepository.findByExternalId(eventData.id)
+      }
         ?: throw Exception("Event ${eventData.id} does not exist")
       logger.info("Updating event ${eventData.id}: ${eventData.home_team} vs ${eventData.away_team}")
       existing.isLive = eventData.isLive()
@@ -64,11 +77,18 @@ class EventService(
       existing.homeTeamName = eventData.home_team
       existing.awayTeamName = eventData.away_team
 
-      eventRepository.save(
-        existing
-      )
+      if (existing.completed!!) {
+        updateWithResult(existing)
+      }
+      withContext(Dispatchers.IO) {
+        eventRepository.save(
+          existing
+        )
+      }
     } else {
-      val sportEntity = sportRepository.findByKey(eventData.sport_key)
+      val sportEntity = withContext(Dispatchers.IO) {
+        sportRepository.findByKey(eventData.sport_key)
+      }
         ?: throw Exception("Sport with key ${eventData.sport_key} does not exist")
 
       logger.info("Creating event ${eventData.id}: ${eventData.home_team} vs ${eventData.away_team}")
@@ -84,9 +104,14 @@ class EventService(
       if (eventData.completed != null) {
         newEvent.completed = eventData.completed ?: newEvent.completed
       }
-      eventRepository.save(
-        newEvent
-      )
+      if (eventData.completed!!) {
+        updateWithResult(newEvent)
+      }
+      withContext(Dispatchers.IO) {
+        eventRepository.save(
+          newEvent
+        )
+      }
     }
 
     // save bookmakers --> odds
@@ -209,11 +234,57 @@ class EventService(
     }
   }
 
-  fun updateCompleted(eventId: Int) {
-    val event: Event = eventRepository.findById(eventId).get()
-    event.completed = event.startTime.before(Date())
-    logger.info("Updating event ${event.id} completed to ${event.completed}")
-    eventRepository.save(event)
+  fun emitEventStatusUpdate(event: Event) {
     eventStatusUpdatesSink.emit(event)
   }
+
+  suspend fun fetchScores(sport: String): List<EventData> {
+    val response: HttpResponse =
+      httpClient.request(getScoresApiURL(sport)) {
+        method = HttpMethod.Get
+      }
+    if (response.status != HttpStatusCode.OK) {
+      throw IllegalStateException("Failed to fetch scores: ${response.status}: ${response.bodyAsText()}")
+    }
+    val responseBody = response.bodyAsText()
+    return Json.decodeFromString(ListSerializer(EventData.serializer()), responseBody)
+  }
+
+  suspend fun fetchEventScores(event: Event): EventData? {
+    val response: HttpResponse =
+      httpClient.request(getScoresApiURL(event.sport.key) + "&eventIds=${event.externalId}&daysFrom=1") {
+        method = HttpMethod.Get
+      }
+    if (response.status != HttpStatusCode.OK) {
+      throw IllegalStateException("Failed to fetch scores for one event: ${response.status}: ${response.bodyAsText()}")
+    }
+    val events = Json.decodeFromString(ListSerializer(EventData.serializer()), response.bodyAsText())
+    return events.firstOrNull()
+  }
+
+  suspend fun updateCompleted(eventId: Int) {
+    val event: Event = withContext(Dispatchers.IO) {
+      eventRepository.findById(eventId)
+    }.get()
+    event.completed = event.startTime.before(Date())
+    logger.info("Updating event ${event.id} completed to ${event.completed}")
+
+    withContext(Dispatchers.IO) {
+      eventRepository.save(event)
+    }
+    if (event.completed!!) {
+      updateWithResult(event)
+    }
+    emitEventStatusUpdate(event)
+  }
+
+  private suspend fun updateWithResult(event: Event) {
+    logger.info("Event ${event.id} is completed, fetching final scores")
+    val eventDataWithScores = fetchEventScores(event)
+    if (eventDataWithScores != null) {
+      logger.info("saving final scores for event ${event.id}")
+      saveScores(eventDataWithScores, event)
+    }
+  }
+
 }

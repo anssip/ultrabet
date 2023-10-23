@@ -110,7 +110,7 @@ data class Event(
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
   val markets: List<Market> = emptyList(),
 
-  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
+  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
   val scoreUpdates: MutableList<ScoreUpdate> = mutableListOf()
 )
 

@@ -48,6 +48,8 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 - [x] Live events polling should be more frequent than pre-match events
 - [x] Should also request scores when live
 - [ ] Check `completed` field when polling scores. When completed -> set result and pay out winnings
+- [ ] Show all score updates on current score mouse hover
+- [ ] Add results page to show completed events
 
 ## Frontend
 

@@ -5,7 +5,9 @@ import com.npd.betting.repositories.EventRepository
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Component
 class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
@@ -21,10 +24,6 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
 
   fun getEventApiURL(sport: String, eventId: String): String {
     return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&bookmakers=bet365,betfair,unibet_eu,betclic&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
-  }
-
-  fun getScoresApiURL(sport: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=${EventImporter.MARKETS}&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
   }
 
   @Scheduled(fixedDelay = 60, timeUnit = java.util.concurrent.TimeUnit.SECONDS)
@@ -36,7 +35,9 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
   }
 
   suspend fun importLiveEvents() {
-    val liveEvents = eventRepository.findByIsLiveTrueAndCompletedFalse()
+    val liveEvents = withContext(Dispatchers.IO) {
+      eventRepository.findByIsLiveTrueAndCompletedFalse()
+    }
     logger.debug("Found ${liveEvents.size} live events")
 
     val eventData = fetchEvents(liveEvents)
@@ -50,7 +51,7 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     val sports = eventData.mapNotNull { it.first?.sport_key }.distinct()
     logger.debug("Fetching scores for $sports sports")
     sports.forEach() {
-      val eventsWithScores = fetchScores(it)
+      val eventsWithScores = service.fetchScores(it)
       if (eventsWithScores.isNotEmpty()) {
         eventsWithScores.forEach() { eventWithScores: EventData ->
           val event = liveEvents.find() { liveEvent -> liveEvent.externalId == eventWithScores.id }
@@ -85,15 +86,4 @@ class LiveEventImporter(private val eventRepository: EventRepository, private va
     return data
   }
 
-  suspend fun fetchScores(sport: String): List<EventData> {
-    val response: HttpResponse =
-      httpClient.request(getScoresApiURL(sport)) {
-        method = HttpMethod.Get
-      }
-    if (response.status != HttpStatusCode.OK) {
-      throw IllegalStateException("Failed to fetch scores: ${response.status}: ${response.bodyAsText()}")
-    }
-    val responseBody = response.bodyAsText()
-    return Json.decodeFromString(ListSerializer(EventData.serializer()), responseBody)
-  }
 }
