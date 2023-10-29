@@ -1,6 +1,6 @@
 ## Demo
 
-Demo betting frontend: https://ultrabet-ui.vercel.app
+Demo betting frontend: https://www.parabolicbet.com/
 
 The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssip/ultrabet-ui)
 
@@ -45,6 +45,7 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 
 ### Live events
 
+- [ ] Rename to parabolicbet.com
 - [x] Live events polling should be more frequent than pre-match events
 - [x] Should also request scores when live
 - [ ] Check `completed` field when polling scores. When completed -> set result and pay out winnings
