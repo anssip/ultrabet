@@ -41,7 +41,7 @@ logging:
   level:
     com:
       npd:
-        betting: info
+        betting: debug
       mysql:
         cj: info
     reactor:

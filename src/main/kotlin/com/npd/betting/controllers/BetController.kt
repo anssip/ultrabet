@@ -44,10 +44,13 @@ class BetController @Autowired constructor(
   @SchemaMapping(typeName = "Mutation", field = "placeBet")
   @Transactional
   fun placeBet(
+    @Argument("betType") betType: String,
     @Argument("userId") userId: Int,
     @Argument("marketOptions") marketOptionIds: List<Int>,
     @Argument("stake") stake: BigDecimal
   ): Bet {
+    // TODO: use bet type to determiine what kind of bet to create. Store the type in the bets table.
+
     val user = userRepository.findById(userId).orElseThrow { NotFoundException("User not found") }
     user.wallet.let { wallet ->
       if (wallet == null) {

@@ -237,14 +237,11 @@ data class Bet(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   val id: Int? = null,
-) {
-  constructor(user: User, stake: BigDecimal, status: BetStatus, marketOptions: List<MarketOption>) : this(
-    user,
-    stake,
-    status
+
+  @Column(name = "created_at", nullable = false)
+  var createdAt: Timestamp,
   ) {
-    this.betOptions = marketOptions.map { BetOption(this, it) }.toMutableList()
-  }
+  constructor(user: User, stake: BigDecimal, status: BetStatus) : this(user, stake, status, mutableListOf(), null, Timestamp(System.currentTimeMillis()))
 
   fun calculatePotentialWinnings(): BigDecimal {
     return betOptions.fold(stake) { total, betOption ->

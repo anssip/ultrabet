@@ -100,3 +100,22 @@ CREATE TABLE `bet_options`
     FOREIGN KEY (`bet_id`) REFERENCES `bets` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`market_option_id`) REFERENCES `market_options` (`id`) ON DELETE CASCADE
 );
+
+CREATE TABLE `bets`
+(
+    `id`         INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id`    INT                                         NOT NULL,
+    `stake`      DECIMAL(10, 2)                              NOT NULL,
+    `created_at` TIMESTAMP                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `status`     ENUM ('PENDING', 'WON', 'LOST', 'CANCELED') NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `bet_options`
+(
+    `id`               INT AUTO_INCREMENT PRIMARY KEY,
+    `bet_id`           INT NOT NULL,
+    `market_option_id` INT NOT NULL,
+    FOREIGN KEY (`bet_id`) REFERENCES `bets` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`market_option_id`) REFERENCES `market_options` (`id`) ON DELETE CASCADE
+);

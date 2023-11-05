@@ -6,6 +6,7 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 
 # TODO
 
+- [ ] Map internal errors to GraphQL errors that show properly in the client 
 - [x] GraphQL subscriptions
 - [x] Make it update market_option.last_updated_at
 - [x] Entities (for JPA)

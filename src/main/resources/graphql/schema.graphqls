@@ -109,9 +109,7 @@ type BetOption {
 
 type Bet {
     id: ID!
-    userId: ID!
     user: User
-    marketOptionId: ID!
     betOptions: [BetOption]
     stake: Float!
     potentialWinnings: Float!
@@ -150,10 +148,24 @@ enum TransactionType {
     BET_REFUNDED
 }
 
+"""
+https://chat.openai.com/share/92b7bc9f-6fc6-4f57-9a4e-f217270ad271
+"""
+enum BetType {
+    SINGLE
+    PARLAY # same as long bet or accumulator
+    SYSTEM
+}
+
 type Subscription {
     liveMarketOptionsUpdated: [MarketOption]
     eventScoresUpdated: [Event]
     eventStatusUpdated: [Event]
+}
+
+input BetOptionInput {
+    marketOptionId: ID!
+    stake: Float!
 }
 
 # Queries
@@ -179,7 +191,14 @@ type Query {
 
 type Mutation {
     createUser(username: String!, email: String!, password: String!): User
-    placeBet(userId: ID!, marketOptions: [ID!]!, stake: Float!): Bet
+    """
+    Places a bet on the provided market options.
+    """
+    placeBet(betType: BetType!, userId: ID!, marketOptions: [ID!]!, stake: Float!): Bet
+    """
+    Place multiple single bets, one for each option provided.
+    """
+    placeSingleBets(userId: ID!, options: [BetOptionInput!]!): Bet
 
     depositFunds(userId: ID!, amount: Float!): Wallet
     withdrawFunds(userId: ID!, amount: Float!): Wallet
