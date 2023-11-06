@@ -1,0 +1,34 @@
+#import "./common.graphqls"
+
+extend type Query {
+    getBet(id: ID!): Bet
+    listBets(userId: ID!): [Bet]
+
+    # TODO: admin queries, should use pagination
+    # listUsers: [User]
+    # listBets: [Bet]
+
+}
+
+
+type Mutation {
+    createUser(username: String!, email: String!, password: String!): User
+    """
+    Places a bet on the provided market options.
+    """
+    placeBet(betType: BetType!, userId: ID!, marketOptions: [ID!]!, stake: Float!): Bet
+    """
+    Place multiple single bets, one for each option provided.
+    """
+    placeSingleBets(userId: ID!, options: [BetOptionInput!]!): Bet
+
+    depositFunds(userId: ID!, amount: Float!): Wallet
+    withdrawFunds(userId: ID!, amount: Float!): Wallet
+
+    # should be available for admins only:
+    createEvent(name: String!, startTime: String!, sport: String!): Event
+    createMarket(name: String!, eventId: ID!): Market
+    createMarketOption(name: String!, odds: Float!, marketId: ID!): MarketOption
+}
+
+

@@ -15,7 +15,7 @@ class CanceledEventUpdater(
 ) {
   val logger: Logger = LoggerFactory.getLogger(CanceledEventUpdater::class.java)
 
-  @Scheduled(fixedRate = 1 * 60000) // Poll the API every 30 minutes
+//  @Scheduled(fixedRate = 1 * 60000) // Poll the API every 30 minutes
   @Transactional
   fun updateEvents() {
     logger.debug("Updating canceled events")

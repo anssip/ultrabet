@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   kotlin("jvm") version "1.7.22"
-  id("org.springframework.boot") version "3.1.2"
+  id("org.springframework.boot") version "3.1.5"
   id("io.spring.dependency-management") version "1.1.0"
   kotlin("plugin.spring") version "1.8.20"
   kotlin("plugin.jpa") version "1.8.20"
@@ -30,6 +30,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-graphql")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
   implementation("org.hibernate:hibernate-core:6.1.7.Final")
   implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
@@ -46,6 +47,13 @@ dependencies {
   implementation("com.graphql-java:graphql-java-extended-scalars:20.0")
   implementation("com.graphql-java:graphiql-spring-boot-starter:3.0.3")
   implementation("com.graphql-java:graphql-spring-boot-starter:5.0.2")
+
+  implementation("com.okta.spring:okta-spring-boot-starter:3.0.5")
+
+  implementation("com.auth0:auth0:2.7.0")
+  implementation("com.auth0:java-jwt:4.4.0")
+  implementation("com.auth0:jwks-rsa:0.22.1")
+
 
   runtimeOnly("com.mysql:mysql-connector-j")
 }

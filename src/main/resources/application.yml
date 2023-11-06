@@ -18,19 +18,18 @@ spring:
       hibernate:
         format_sql:
           true
-  graphql:
-    path: /graphql
-    cors:
-      allowed-origins: '*'
-      allowed-methods: '*'
-    webSocket:
-      path: /subscriptions
-    schema:
-      printer:
-        enabled: true
-    graphiql:
-      enabled: true
-      path: /graphiql
+#  graphql:
+#    webSocket:
+#      path: /subscriptions
+
+#    graphiql:
+#      enabled: true
+#      path: /graphiql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://parabolicbet.eu.auth0.com/
 management:
   endpoints:
     web:
@@ -46,12 +45,12 @@ logging:
         cj: info
     reactor:
       netty:
-        http: error
+        http: debug
     org:
       springframework:
         web: DEBUG
         http: error
-        graphql: error
+        graphql: debug
         jpa: info
       hibernate:
         SQL: info
@@ -59,5 +58,8 @@ logging:
           descriptor:
             sql:
               BasicBinder: info
-
-
+okta:
+  oauth0:
+    issuer-uri: https://parabolicbet.eu.auth0.com/
+    client-id: IHCyxIXxF8bVJThvviAF583taf9E7HfN
+    audience: https://parabolicbet.eu.auth0.com/api/v2/
