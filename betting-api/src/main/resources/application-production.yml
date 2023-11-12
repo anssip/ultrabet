@@ -19,7 +19,7 @@ spring:
         format_sql:
           true
   graphql:
-    path: /graphql
+    path: /private/graphql
     cors:
       allowed-origins: '*'
       allowed-methods: '*'
@@ -28,7 +28,12 @@ spring:
         enabled: true
     graphiql:
       enabled: true
-      path: /graphiql
+      path: /private/graphiql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://parabolicbet.eu.auth0.com/
 management:
   endpoints:
     web:
