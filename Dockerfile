@@ -8,7 +8,7 @@ WORKDIR /home/gradle/src
 
 # Build the project and dependencies
 RUN ./gradlew clean build bootJar --no-daemon || (echo "Gradle build failed!" && exit 1)
-RUN ls -la build/libs || (echo "Directory listing failed!" && exit 1)
+RUN ls -la application/build/libs || (echo "Directory listing failed!" && exit 1)
 
 # After building run the thing
 FROM amazoncorretto:17.0.7-alpine
