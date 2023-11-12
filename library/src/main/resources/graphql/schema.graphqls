@@ -1,0 +1,210 @@
+scalar DateTime
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    password: String!
+    wallet: Wallet
+    bets: [Bet]
+}
+
+"""
+An Event represents a sports match or competition on which users can place bets.
+"""
+type Event {
+    id: ID!
+    """
+    The id of the event in the source system.
+    """
+    externalId: String
+    """
+    Is this event currently live?
+    """
+    isLive: Boolean!
+    """
+    Is this event completed?
+    """
+    completed: Boolean!
+    name: String!
+    homeTeamName: String!
+    awayTeamName: String!
+    startTime: String!
+    sport: Sport!
+    markets(source: String): [Market]
+    scoreUpdates: [ScoreUpdate]
+}
+
+type Sport {
+    id: ID!
+    key: String!
+    """
+    Is this sport in season at the moment?
+    """
+    active: Boolean!
+    group: String!
+    description: String!
+    title: String!
+    """
+    Does this sport have outright markets?
+    """
+    hasOutrights: Boolean!
+}
+
+"""
+A Market represents a specific betting opportunity within an event.
+It's usually associated with one aspect of the event that users can bet on.
+A single event can have multiple markets. Some common examples of markets
+include Moneyline, Point Spread, and Totals (Over/Under).
+"""
+type Market {
+    id: ID!
+    """
+    What is the source or bookmaker that provides the odds for this Market?
+    """
+    source: String!
+    """
+    Is this Market available for live betting?
+    """
+    isLive: Boolean!
+    """
+    When was this Market last updated? Used to track when the odds were last
+    updated during live betting.
+    """
+    lastUpdated: String
+    name: String!
+    event: Event
+    options: [MarketOption]
+}
+
+"""
+A MarketOption represents a specific choice or outcome within a market
+that users can bet on. Each market typically has two or more options to choose from.
+"""
+type MarketOption {
+    id: ID!
+    """
+    When was this Market last updated? Used to track when the odds were last
+    updated during live betting.
+    """
+    lastUpdated: String
+    name: String!
+    odds: Float!
+    market: Market
+}
+
+type ScoreUpdate {
+    id: ID!
+    event: Event!
+    score: String!
+    name: String!
+    timestamp: String!
+}
+
+type BetOption {
+    id: Int!
+    bet: Bet!
+    marketOption: MarketOption!
+}
+
+type Bet {
+    id: ID!
+    user: User
+    betOptions: [BetOption]
+    stake: Float!
+    potentialWinnings: Float!
+    createdAt: String!
+    status: BetStatus!
+}
+
+type Wallet {
+    id: ID!
+    userId: ID!
+    user: User
+    balance: Float!
+    transactions: [Transaction]
+}
+
+type Transaction {
+    id: ID!
+    wallet: Wallet
+    amount: Float!
+    transactionType: TransactionType!
+    createdAt: String!
+}
+
+enum BetStatus {
+    PENDING
+    WON
+    LOST
+    CANCELED
+}
+
+enum TransactionType {
+    DEPOSIT
+    WITHDRAWAL
+    BET_PLACED
+    BET_WON
+    BET_REFUNDED
+}
+
+"""
+https://chat.openai.com/share/92b7bc9f-6fc6-4f57-9a4e-f217270ad271
+"""
+enum BetType {
+    SINGLE
+    PARLAY # same as long bet or accumulator
+    SYSTEM
+}
+
+type Subscription {
+    liveMarketOptionsUpdated: [MarketOption]
+    eventScoresUpdated: [Event]
+    eventStatusUpdated: [Event]
+}
+
+input BetOptionInput {
+    marketOptionId: ID!
+    stake: Float!
+}
+
+# Queries
+
+type Query {
+    getUser(id: ID!): User
+    getEvent(id: ID!): Event
+    listEvents: [Event]
+    getMarket(id: ID!): Market
+    listMarkets(eventId: ID!): [Market]
+    getBet(id: ID!): Bet
+    listBets(userId: ID!): [Bet]
+
+    listLiveEvents: [Event]
+    listLiveMarkets(eventId: ID!): [Market]
+
+    # TODO: admin queries, should use pagination
+    # listUsers: [User]
+    # listBets: [Bet]
+}
+
+# Mutations
+
+type Mutation {
+    createUser(username: String!, email: String!, password: String!): User
+    """
+    Places a bet on the provided market options.
+    """
+    placeBet(betType: BetType!, userId: ID!, marketOptions: [ID!]!, stake: Float!): Bet
+    """
+    Place multiple single bets, one for each option provided.
+    """
+    placeSingleBets(userId: ID!, options: [BetOptionInput!]!): Bet
+
+    depositFunds(userId: ID!, amount: Float!): Wallet
+    withdrawFunds(userId: ID!, amount: Float!): Wallet
+
+    # should be available for admins only:
+    createEvent(name: String!, startTime: String!, sport: String!): Event
+    createMarket(name: String!, eventId: ID!): Market
+    createMarketOption(name: String!, odds: Float!, marketId: ID!): MarketOption
+}

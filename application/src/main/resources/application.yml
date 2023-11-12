@@ -1,0 +1,63 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: springboot-graphql-example
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/betting1}
+    username: ${DB_USERNAME:betadmin}
+    password: ${DB_PASSWORD:asdf123_}
+    hikari:
+      maximum-pool-size=6
+      minimum-idle=4
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql:
+          true
+  graphql:
+    path: /graphql
+    cors:
+      allowed-origins: '*'
+      allowed-methods: '*'
+    webSocket:
+      path: /subscriptions
+    schema:
+      printer:
+        enabled: true
+    graphiql:
+      enabled: true
+      path: /graphiql
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+logging:
+  root: DEBUG
+  level:
+    com:
+      npd:
+        betting: debug
+      mysql:
+        cj: info
+    reactor:
+      netty:
+        http: error
+    org:
+      springframework:
+        web: DEBUG
+        http: error
+        graphql: error
+        jpa: info
+      hibernate:
+        SQL: info
+        type:
+          descriptor:
+            sql:
+              BasicBinder: info
+
+
