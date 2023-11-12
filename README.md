@@ -1,3 +1,9 @@
+# Introduction
+
+This is a sports betting backend implemented in Kotlin and Spring Boot. It features a GraphQL API and a WebSocket subscription API.
+
+This is a work in progress. It is not yet ready for production use yet.
+
 ## Demo
 
 Demo betting frontend: https://www.parabolicbet.com/
