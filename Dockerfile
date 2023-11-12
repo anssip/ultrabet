@@ -14,5 +14,5 @@ RUN ls -la application/build/libs || (echo "Directory listing failed!" && exit 1
 FROM amazoncorretto:17.0.7-alpine
 
 VOLUME /tmp
-COPY --from=build /home/gradle/src/application/build/libs/ultrabet-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /home/gradle/src/application/build/libs/application-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
