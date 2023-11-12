@@ -27,7 +27,7 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 - [x] Deploy somewhere
 - [ ] Pagination TBD when building the UI
 - [ ] add completedEvents query
-- [ ] scheduled update of completed events. Canceled events are now left non-completed.
+- [x] scheduled update of completed events. Canceled events are now left non-completed.
 
 ## Major work items
 
