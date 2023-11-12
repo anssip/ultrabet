@@ -1,5 +1,7 @@
 package com.npd.betting
 
+import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest
+import org.springframework.boot.autoconfigure.security.reactive.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -20,8 +22,8 @@ open class SecurityConfig {
       .authorizeHttpRequests(
         Customizer { authorize ->
           authorize
-            .requestMatchers("/graphql").authenticated()
-            .requestMatchers("/subscription").authenticated()
+            .requestMatchers("/private/actuator/health").permitAll()
+            .requestMatchers("/private/graphql").authenticated()
         }
       )
       .cors(Customizer.withDefaults())

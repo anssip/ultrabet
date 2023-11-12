@@ -19,7 +19,7 @@ spring:
         format_sql:
           true
   graphql:
-    path: /graphql
+    path: /private/graphql
     cors:
       allowed-origins: '*'
       allowed-methods: '*'
@@ -28,7 +28,7 @@ spring:
         enabled: true
     graphiql:
       enabled: true
-      path: /graphiql
+      path: /private/graphiql
   security:
     oauth2:
       resourceserver:
@@ -37,6 +37,7 @@ spring:
 management:
   endpoints:
     web:
+      base-path: /private/actuator
       exposure:
         include: health,metrics,info
 logging:
