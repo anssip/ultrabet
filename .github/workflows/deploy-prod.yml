@@ -12,6 +12,7 @@ on:
       - '.github/**'
       - 'bin/**'
       - '**.md'
+      - 'betting-api/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
