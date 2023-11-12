@@ -61,7 +61,7 @@ jobs:
       # use the same task definition as with the main betting app "ultrabet-task-prod"
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition ultrabet-task-prod --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition betapi-task-definiton --query taskDefinition > task-definition.json
 
       - name: Render Amazon ECS task definition
         id: render-container
