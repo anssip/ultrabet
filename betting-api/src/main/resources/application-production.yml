@@ -37,6 +37,7 @@ spring:
 management:
   endpoints:
     web:
+      base-path: /private/actuator
       exposure:
         include: health,metrics,info
 logging:
