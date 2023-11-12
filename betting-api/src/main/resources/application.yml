@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   application:
-    name: parabolic-bet-backend
+    name: parabolic-betting-api
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/betting1}
     username: ${DB_USERNAME:betadmin}
@@ -23,14 +23,17 @@ spring:
     cors:
       allowed-origins: '*'
       allowed-methods: '*'
-    webSocket:
-      path: /subscriptions
     schema:
       printer:
         enabled: true
     graphiql:
       enabled: true
       path: /graphiql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://parabolicbet.eu.auth0.com/
 management:
   endpoints:
     web:
@@ -59,5 +62,8 @@ logging:
           descriptor:
             sql:
               BasicBinder: info
-
-
+okta:
+  oauth0:
+    issuer: https://parabolicbet.eu.auth0.com/
+    client-id: IHCyxIXxF8bVJThvviAF583taf9E7HfN
+    audience: https://parabolicbet.eu.auth0.com/api/v2/

@@ -2,7 +2,7 @@ server:
   port: 80
 spring:
   application:
-    name: springboot-graphql-example
+    name: parabolic-bet-backend
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/betting1}
     username: ${DB_USERNAME:betadmin}
