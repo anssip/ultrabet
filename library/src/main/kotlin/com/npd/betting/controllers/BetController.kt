@@ -7,12 +7,15 @@ import com.npd.betting.repositories.BetOptionRepository
 import com.npd.betting.repositories.BetRepository
 import com.npd.betting.repositories.MarketOptionRepository
 import com.npd.betting.repositories.UserRepository
+import com.npd.betting.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import org.springframework.security.oauth2.jwt.Jwt
 
 class NotFoundException(message: String) : RuntimeException(message)
 class InsufficientFundsException(message: String) : RuntimeException(message)
@@ -24,6 +27,7 @@ open class BetController @Autowired constructor(
   private val userRepository: UserRepository,
   private val marketOptionRepository: MarketOptionRepository,
   private val betOptionRepository: BetOptionRepository,
+  private val userService: UserService
 ) {
 
   @SchemaMapping(typeName = "Query", field = "getBet")
@@ -45,13 +49,11 @@ open class BetController @Autowired constructor(
   @Transactional
   open fun placeBet(
     @Argument("betType") betType: String,
-    @Argument("userId") userId: Int,
     @Argument("marketOptions") marketOptionIds: List<Int>,
     @Argument("stake") stake: BigDecimal
   ): Bet {
-    // TODO: use bet type to determiine what kind of bet to create. Store the type in the bets table.
+    val user = userService.findAuthenticatedUser()
 
-    val user = userRepository.findById(userId).orElseThrow { NotFoundException("User not found") }
     user.wallet.let { wallet ->
       if (wallet == null) {
         throw RuntimeException("User has no wallet")

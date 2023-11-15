@@ -4,7 +4,6 @@ type User {
     id: ID!
     username: String!
     email: String!
-    password: String!
     wallet: Wallet
     bets: [Bet]
 }
@@ -190,11 +189,11 @@ type Query {
 # Mutations
 
 type Mutation {
-    createUser(username: String!, email: String!, password: String!): User
+    createUser(username: String!, email: String!): User
     """
     Places a bet on the provided market options.
     """
-    placeBet(betType: BetType!, userId: ID!, marketOptions: [ID!]!, stake: Float!): Bet
+    placeBet(betType: BetType!, marketOptions: [ID!]!, stake: Float!): Bet
     """
     Place multiple single bets, one for each option provided.
     """

@@ -1,4 +1,4 @@
-package com.npd.betting.importer
+package com.npd.betting.services.importer
 
 import com.npd.betting.repositories.EventRepository
 import kotlinx.coroutines.runBlocking

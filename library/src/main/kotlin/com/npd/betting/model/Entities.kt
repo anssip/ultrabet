@@ -17,9 +17,6 @@ data class User(
   @Column(name = "email", unique = true, nullable = false)
   val email: String,
 
-  @Column(name = "password", nullable = false)
-  val password: String,
-
   @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
   var wallet: Wallet? = null,
 

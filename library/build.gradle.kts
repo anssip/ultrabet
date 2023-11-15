@@ -30,6 +30,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-graphql")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.security:spring-security-core")
+	implementation("org.springframework.security:spring-security-oauth2-jose")
 
 	implementation("org.hibernate:hibernate-core:6.1.7.Final")
 	implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")

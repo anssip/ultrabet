@@ -9,10 +9,12 @@ import java.sql.Timestamp
 // https://www.tutorialspoint.com/spring_boot_jpa/spring_boot_jpa_repository_methods.htm
 
 interface UserRepository : JpaRepository<User, Int> {
-  // Custom methods can be added here if needed
+  fun findByEmail(email: String): User?
 }
 
-interface WalletRepository : JpaRepository<Wallet, Int>
+interface WalletRepository : JpaRepository<Wallet, Int> {
+  fun findByUserId(userId: Int): Wallet?
+}
 
 interface BetRepository : JpaRepository<Bet, Int> {
   fun findByUserId(userId: Int): List<Bet>

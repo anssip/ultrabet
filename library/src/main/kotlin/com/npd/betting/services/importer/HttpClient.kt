@@ -1,4 +1,4 @@
-package com.npd.betting.importer
+package com.npd.betting.services.importer
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*

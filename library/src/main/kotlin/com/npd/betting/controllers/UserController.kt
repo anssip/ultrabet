@@ -34,9 +34,8 @@ class UserController @Autowired constructor(
     }
 
     @MutationMapping
-    fun createUser(@Argument username: String, @Argument email: String, @Argument password: String): User {
-        // TODO: this is a naive implementation. We should hash the password etc.
-        val user = User(username = username, email = email, password = password)
+    fun createUser(@Argument username: String, @Argument email: String): User {
+        val user = User(username = username, email = email)
         val wallet = Wallet(user = user, balance = BigDecimal.ZERO)
         user.wallet = wallet
         userRepository.save(user)

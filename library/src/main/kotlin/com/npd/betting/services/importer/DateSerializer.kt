@@ -1,4 +1,4 @@
-package com.npd.betting.importer
+package com.npd.betting.services.importer
 
 
 import kotlinx.serialization.ExperimentalSerializationApi
