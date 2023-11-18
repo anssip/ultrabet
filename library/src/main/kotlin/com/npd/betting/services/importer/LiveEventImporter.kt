@@ -1,5 +1,6 @@
 package com.npd.betting.services.importer
 
+import com.npd.betting.Props
 import com.npd.betting.model.Event
 import com.npd.betting.repositories.EventRepository
 import io.ktor.client.request.*
@@ -8,7 +9,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
@@ -16,14 +16,17 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Component
-open class LiveEventImporter(private val eventRepository: EventRepository, private val service: EventService) {
+open class LiveEventImporter(
+  private val props: Props,
+  private val eventRepository: EventRepository,
+  private val service: EventService
+) {
   val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
 
   fun getEventApiURL(sport: String, eventId: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&bookmakers=bet365,betfair,unibet_eu,betclic&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&bookmakers=bet365,betfair,unibet_eu,betclic&dateFormat=unix&apiKey=${EventImporter.getEventsUrl(props.getOddsApiKey())}"
   }
 
   @Scheduled(fixedDelay = 60, timeUnit = java.util.concurrent.TimeUnit.SECONDS)

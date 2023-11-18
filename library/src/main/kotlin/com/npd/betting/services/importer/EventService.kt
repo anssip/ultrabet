@@ -1,5 +1,6 @@
 package com.npd.betting.services.importer
 
+import com.npd.betting.Props
 import com.npd.betting.controllers.AccumulatingSink
 import com.npd.betting.model.*
 import com.npd.betting.repositories.*
@@ -19,6 +20,7 @@ import java.util.*
 
 @Service
 class EventService(
+  private val props: Props,
   private val eventRepository: EventRepository,
   private val marketRepository: MarketRepository,
   private val marketOptionRepository: MarketOptionRepository,
@@ -31,7 +33,7 @@ class EventService(
   val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
 
   fun getScoresApiURL(sport: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=${EventImporter.MARKETS}&dateFormat=unix&apiKey=${EventImporter.API_KEY}"
+    return "${EventImporter.API_BASE}/sports/$sport/scores/?daysFrom=2&&markets=${EventImporter.MARKETS}&dateFormat=unix&apiKey=${props.getOddsApiKey()}"
   }
 
   suspend fun importEvents(eventsData: List<EventData>) {

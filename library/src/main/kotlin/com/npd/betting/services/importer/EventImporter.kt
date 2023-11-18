@@ -1,5 +1,6 @@
 package com.npd.betting.services.importer
 
+import com.npd.betting.Props
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -72,18 +73,21 @@ data class MarketOptionData(
 
 
 @Component
-open class EventImporter(private val service: EventService) {
+open class EventImporter(private val props: Props, private val service: EventService) {
   val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
 
   companion object {
-    const val API_KEY = "e0f4fe902a9673daf7a78104feb2523e"
     const val API_BASE = "https://api.the-odds-api.com/v4/"
     const val MARKETS = "h2h"
     private const val BOOKMAKERS = "bet365,betfair,unibet_eu,betclic"
 
-    const val EVENTS_URL =
-      "$API_BASE/sports/upcoming/odds/?markets=$MARKETS&bookmakers=$BOOKMAKERS&dateFormat=unix&apiKey=$API_KEY"
-    const val SPORTS_URL = "$API_BASE/sports/?apiKey=$API_KEY"
+    fun getEventsUrl(apiKey: String): String {
+      return "$API_BASE/sports/upcoming/odds/?markets=$MARKETS&bookmakers=$BOOKMAKERS&dateFormat=unix&apiKey=$apiKey"
+    }
+
+    fun getSportsUrl(apiKey: String): String {
+      return "$API_BASE/sports/?apiKey=$apiKey"
+    }
   }
 
   @Scheduled(fixedRate = 60, timeUnit = java.util.concurrent.TimeUnit.MINUTES) // Poll the API every 60 minutes
@@ -105,7 +109,7 @@ open class EventImporter(private val service: EventService) {
   }
 
   suspend fun fetchSports(): List<SportData> {
-    val response: HttpResponse = httpClient.get(SPORTS_URL)
+    val response: HttpResponse = httpClient.get(getSportsUrl(props.getOddsApiKey()))
     if (response.status != HttpStatusCode.OK) {
       throw IllegalStateException("Failed to fetch sports")
     }
@@ -114,7 +118,7 @@ open class EventImporter(private val service: EventService) {
   }
 
   suspend fun fetchEvents(): List<EventData> {
-    val response: HttpResponse = httpClient.get(EVENTS_URL)
+    val response: HttpResponse = httpClient.get(getEventsUrl(props.getOddsApiKey()))
     if (response.status != HttpStatusCode.OK) {
       throw IllegalStateException("Failed to fetch events")
     }

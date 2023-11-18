@@ -59,5 +59,6 @@ logging:
           descriptor:
             sql:
               BasicBinder: info
-
+ultrabet:
+  oddsApiKey: ${ODDS_API_KEY}
 
