@@ -197,7 +197,7 @@ type Mutation {
     """
     Place multiple single bets, one for each option provided.
     """
-    placeSingleBets(userId: ID!, options: [BetOptionInput!]!): Bet
+    placeSingleBets(options: [BetOptionInput!]!): [Bet]
 
     depositFunds(userId: ID!, amount: Float!): Wallet
     withdrawFunds(userId: ID!, amount: Float!): Wallet

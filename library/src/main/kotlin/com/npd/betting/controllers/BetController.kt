@@ -11,15 +11,19 @@ import com.npd.betting.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.SchemaMapping
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
-import org.springframework.security.oauth2.jwt.Jwt
 
 class NotFoundException(message: String) : RuntimeException(message)
 class InsufficientFundsException(message: String) : RuntimeException(message)
 class InvalidBetStatusException(message: String) : RuntimeException(message)
+
+
+class BetOptionInput(
+  val marketOptionId: Int,
+  val stake: BigDecimal
+)
 
 @Controller
 open class BetController @Autowired constructor(
@@ -81,5 +85,41 @@ open class BetController @Autowired constructor(
       wallet!!.balance -= stake
     }
     return savedBet
+  }
+
+  @SchemaMapping(typeName = "Mutation", field = "placeSingleBets")
+  @Transactional
+  open fun placeSingleBets(
+    @Argument("options") options: List<BetOptionInput>
+  ): List<Bet> {
+    val user = userService.findAuthenticatedUser()
+
+    user.wallet.let { wallet ->
+      if (wallet == null) {
+        throw RuntimeException("User has no wallet")
+      }
+    }
+
+    return options.map { option ->
+      val bet = Bet(user, option.stake, BetStatus.PENDING)
+      val savedBet = betRepository.save(bet) // Save the Bet entity first to generate the ID
+
+      val marketOption = marketOptionRepository.findById(option.marketOptionId)
+      if (marketOption.isEmpty) {
+        throw NotFoundException("Market option not found")
+      }
+
+      user.wallet.let { wallet ->
+        if (wallet!!.balance < option.stake) {
+          throw InsufficientFundsException("Insufficient funds")
+        }
+        wallet.balance -= option.stake
+      }
+
+      val betOption = BetOption(savedBet, marketOption.get()) // Use the savedBet with the generated ID
+      betOptionRepository.save(betOption)
+      savedBet.betOptions.add(betOption)
+      savedBet
+    }
   }
 }
