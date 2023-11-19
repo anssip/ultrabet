@@ -24,23 +24,19 @@ class UserService @Autowired constructor(
 
   fun findAuthenticatedUser(): User {
     val principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal() as Jwt;
-    val email = principal.getClaimAsString("email")
-    if (email == null || email == "") {
-      throw RuntimeException("No email found in JWT")
-    }
-    val user = userRepository.findByEmail(email)
+    val sub = principal.getClaimAsString("sub")
+
+    val user = userRepository.findByExternalId(sub)
     if (user == null) {
-      logger.info("creating new user for email ${email}");
-      return createUser(principal)
+      logger.info("creating new user for externalId ${sub}");
+      return createUser(sub)
     }
     logger.info("found user ${user.id}")
     return user
   }
 
-  private fun createUser(principal: Jwt): User {
-    val email = principal.getClaimAsString("email")
-    val nickname = principal.getClaimAsString("nickname")
-    val user = userController.createUser(nickname ?: email, email)
+  private fun createUser(sub: String): User {
+    val user = userController.createUser(externalId = sub, email = null, username = null)
 
     // make sure he has money :-)
     val wallet = walletRepository.findByUserId(user.id)

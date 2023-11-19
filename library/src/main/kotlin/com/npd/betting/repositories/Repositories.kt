@@ -10,6 +10,7 @@ import java.sql.Timestamp
 
 interface UserRepository : JpaRepository<User, Int> {
   fun findByEmail(email: String): User?
+  fun findByExternalId(externalId: String?): User?
 }
 
 interface WalletRepository : JpaRepository<Wallet, Int> {

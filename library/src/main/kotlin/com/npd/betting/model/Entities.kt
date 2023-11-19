@@ -11,11 +11,14 @@ data class User(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Int = 0,
 
-  @Column(name = "username", unique = true, nullable = false)
-  val username: String,
+  @Column(name = "external_id", unique = true, nullable = false)
+  val externalId: String,
 
-  @Column(name = "email", unique = true, nullable = false)
-  val email: String,
+  @Column(name = "username", unique = true, nullable = true)
+  val username: String?,
+
+  @Column(name = "email", unique = true, nullable = true)
+  val email: String?,
 
   @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
   var wallet: Wallet? = null,

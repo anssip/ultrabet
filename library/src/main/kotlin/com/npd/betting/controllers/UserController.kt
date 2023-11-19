@@ -34,8 +34,8 @@ class UserController @Autowired constructor(
     }
 
     @MutationMapping
-    fun createUser(@Argument username: String, @Argument email: String): User {
-        val user = User(username = username, email = email)
+    fun createUser(@Argument externalId: String, @Argument username: String? = null, @Argument email: String?): User {
+        val user = User(username = username, email = email, externalId = externalId)
         val wallet = Wallet(user = user, balance = BigDecimal.ZERO)
         user.wallet = wallet
         userRepository.save(user)
