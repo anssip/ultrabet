@@ -40,8 +40,9 @@ open class BetController @Autowired constructor(
   }
 
   @SchemaMapping(typeName = "Query", field = "listBets")
-  fun listBets(@Argument userId: Int): List<Bet> {
-    return betRepository.findByUserId(userId)
+  fun listBets(): List<Bet> {
+    val user = userService.findAuthenticatedUser()
+    return betRepository.findByUserId(user.id)
   }
 
   @SchemaMapping(typeName = "Bet", field = "potentialWinnings")

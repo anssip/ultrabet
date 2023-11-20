@@ -176,7 +176,7 @@ type Query {
     getMarket(id: ID!): Market
     listMarkets(eventId: ID!): [Market]
     getBet(id: ID!): Bet
-    listBets(userId: ID!): [Bet]
+    listBets: [Bet]
 
     listLiveEvents: [Event]
     listLiveMarkets(eventId: ID!): [Market]

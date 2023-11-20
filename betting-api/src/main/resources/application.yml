@@ -53,10 +53,11 @@ logging:
         http: error
     org:
       springframework:
-        web: DEBUG
+        web: INFO
         http: error
-        graphql: error
+        graphql: DEBUG
         jpa: info
+        security: DEBUG
       hibernate:
         SQL: info
         type:
