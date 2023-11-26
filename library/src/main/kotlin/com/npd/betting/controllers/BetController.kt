@@ -9,6 +9,7 @@ import com.npd.betting.repositories.MarketOptionRepository
 import com.npd.betting.repositories.UserRepository
 import com.npd.betting.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.stereotype.Controller
@@ -42,7 +43,7 @@ open class BetController @Autowired constructor(
   @SchemaMapping(typeName = "Query", field = "listBets")
   fun listBets(): List<Bet> {
     val user = userService.findAuthenticatedUser()
-    return betRepository.findByUserId(user.id)
+    return betRepository.findByUserIdOrderByCreatedAtDesc(user.id, PageRequest.of(0, 10))
   }
 
   @SchemaMapping(typeName = "Bet", field = "potentialWinnings")

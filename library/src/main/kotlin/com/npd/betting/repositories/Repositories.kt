@@ -1,6 +1,7 @@
 package com.npd.betting.repositories
 
 import com.npd.betting.model.*
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
@@ -18,7 +19,7 @@ interface WalletRepository : JpaRepository<Wallet, Int> {
 }
 
 interface BetRepository : JpaRepository<Bet, Int> {
-  fun findByUserId(userId: Int): List<Bet>
+  fun findByUserIdOrderByCreatedAtDesc(userId: Int, pageable: Pageable): List<Bet>
 }
 
 @Repository
