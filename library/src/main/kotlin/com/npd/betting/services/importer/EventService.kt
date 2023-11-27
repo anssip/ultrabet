@@ -52,7 +52,7 @@ class EventService(
           existing.isLive = eventData.isLive()
           existing.completed = eventData.completed ?: existing.completed
           val saved = eventRepository.save(existing)
-          println("Event ${saved.id} is now ${if (saved.isLive) "live" else "not live"}. Emitting...")
+          logger.info("Event ${saved.id} is now ${if (saved.isLive) "live" else "not live"}. Emitting...")
           eventStatusUpdatesSink.emit(saved)
         } else {
           logger.debug("Event ${eventData.id} already exists, skipping...")
@@ -151,7 +151,7 @@ class EventService(
       if (existingMarketOption != null && existingMarketOption.odds != BigDecimal(marketOptionData.price)) {
         existingMarketOption.odds = BigDecimal(marketOptionData.price)
         existingMarketOption.lastUpdated = Timestamp(marketData.last_update * 1000)
-
+        logger.info("Event ${event.id}, market ${marketData.key}, source: ${existingMarket.source}, option ${marketOptionData.name} has been updated")
         marketOptionSink.emit(existingMarketOption)
       } else {
         // is this a valid case?
@@ -237,6 +237,7 @@ class EventService(
   }
 
   fun emitEventStatusUpdate(event: Event) {
+    logger.info("Emitting event status update for event ${event.id}")
     eventStatusUpdatesSink.emit(event)
   }
 

@@ -1,5 +1,8 @@
 package com.npd.betting.controllers
 
+import com.npd.betting.services.importer.EventImporter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 import java.time.Duration
@@ -10,6 +13,7 @@ class AccumulatingSink<T>(
   private val clearThreshold: Int = 1000 // Adjust the threshold as needed
 
 ) {
+  val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
   private val sinkProcessor: Sinks.Many<List<T>> = Sinks.many().multicast().onBackpressureBuffer<List<T>>()
   private val accumulatedMessages = mutableListOf<T>()
   private val emittedMessages = mutableSetOf<T>()
@@ -41,6 +45,7 @@ class AccumulatingSink<T>(
       accumulatedMessages.add(message)
       if (accumulatedMessages.size >= bufferSize) {
         val uniqueMessages = accumulatedMessages.filter { it !in emittedMessages }
+        logger.info("Emitting ${uniqueMessages.size} messages")
         emitUniqueMessages(uniqueMessages)
       }
     }

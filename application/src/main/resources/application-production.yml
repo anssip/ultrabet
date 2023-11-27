@@ -37,7 +37,7 @@ management:
       exposure:
         include: health,metrics,info
 logging:
-  root: DEBUG
+  root: info
   level:
     com:
       npd:
@@ -49,7 +49,7 @@ logging:
         http: error
     org:
       springframework:
-        web: DEBUG
+        web: info
         http: error
         graphql: error
         jpa: info
