@@ -12,7 +12,8 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 
 # TODO
 
-- [ ] Add a 2nd application (gradle subproject) that contains a secured GraphQL API for placing bets and other actions that require authentication.
+- [ ] Set results to bets and pay out winnings 
+- [x] Add a 2nd application (gradle subproject) that contains a secured GraphQL API for placing bets and other actions that require authentication.
 - [ ] Map internal errors to GraphQL errors that show properly in the client 
 - [x] GraphQL subscriptions
 - [x] Make it update market_option.last_updated_at
@@ -23,7 +24,6 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 - [x] Import feeds from bets-api.com
 - [ ] Admin queries and mutations
 - [x] Bet should have several MarketOptions (long bet)
-- [ ] Result setting, enhance schemas with results
 - [x] Deploy somewhere
 - [ ] Pagination TBD when building the UI
 - [ ] add completedEvents query
