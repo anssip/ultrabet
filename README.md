@@ -12,7 +12,8 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 
 # TODO
 
-- [ ] Set results to bets and pay out winnings 
+- [x] Set results to bets
+- [ ] pay out winnings 
 - [x] Add a 2nd application (gradle subproject) that contains a secured GraphQL API for placing bets and other actions that require authentication.
 - [ ] Map internal errors to GraphQL errors that show properly in the client 
 - [x] GraphQL subscriptions
