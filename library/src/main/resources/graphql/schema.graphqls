@@ -8,6 +8,12 @@ type User {
     bets: [Bet]
 }
 
+enum EventResult {
+    HOME_TEAM_WIN
+    DRAW
+    AWAY_TEAM_WIN
+}
+
 """
 An Event represents a sports match or competition on which users can place bets.
 """
@@ -32,6 +38,7 @@ type Event {
     sport: Sport!
     markets(source: String): [Market]
     scoreUpdates: [ScoreUpdate]
+    result: EventResult
 }
 
 type Sport {
@@ -104,6 +111,14 @@ type BetOption {
     id: Int!
     bet: Bet!
     marketOption: MarketOption!
+    result: BetResult
+}
+
+enum BetResult {
+    PENDING
+    WON
+    LOST
+    CANCELED
 }
 
 type Bet {
@@ -114,6 +129,7 @@ type Bet {
     potentialWinnings: Float!
     createdAt: String!
     status: BetStatus!
+    result: BetResult
 }
 
 type Wallet {
@@ -167,6 +183,7 @@ input BetOptionInput {
     stake: Float!
 }
 
+
 # Queries
 
 type Query {
@@ -198,6 +215,8 @@ type Mutation {
     Place multiple single bets, one for each option provided.
     """
     placeSingleBets(options: [BetOptionInput!]!): [Bet]
+
+    updateResult(eventId: ID!): Event
 
     depositFunds(userId: ID!, amount: Float!): Wallet
     withdrawFunds(userId: ID!, amount: Float!): Wallet

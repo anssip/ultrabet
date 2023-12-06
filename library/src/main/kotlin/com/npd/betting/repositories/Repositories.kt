@@ -3,6 +3,8 @@ package com.npd.betting.repositories
 import com.npd.betting.model.*
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
 
@@ -20,6 +22,16 @@ interface WalletRepository : JpaRepository<Wallet, Int> {
 
 interface BetRepository : JpaRepository<Bet, Int> {
   fun findByUserIdOrderByCreatedAtDesc(userId: Int, pageable: Pageable): List<Bet>
+
+  @Modifying
+  @Query("UPDATE Bet b SET b.status = com.npd.betting.model.BetStatus.WON WHERE b.status = com.npd.betting.model.BetStatus.PENDING AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)")
+  fun updateAllWinning()
+
+  @Modifying
+  @Query("UPDATE Bet b SET b.status = com.npd.betting.model.BetStatus.LOST WHERE b.status = com.npd.betting.model.BetStatus.PENDING " +
+    "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.PENDING) " +
+    "AND 0 < (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.LOST)")
+  fun updateAllLosing()
 }
 
 @Repository
@@ -45,11 +57,16 @@ interface MarketOptionRepository : JpaRepository<MarketOption, Int> {
 
 interface TransactionRepository : JpaRepository<Transaction, Int>
 
-interface BetOptionRepository : JpaRepository<BetOption, Int>
+interface BetOptionRepository : JpaRepository<BetOption, Int> {
+  @Modifying
+  @Query("UPDATE BetOption b SET b.status = :status WHERE b.marketOption.id = :marketOptionId")
+  fun updateAllByMarketOptionId(marketOptionId: Int, status: BetStatus)
+}
 
 interface ScoreUpdateRepository : JpaRepository<ScoreUpdate, Int> {
   fun findByEventId(eventId: Int): List<ScoreUpdate>
   fun deleteByEventId(eventId: Int)
+  fun findFirstByEventIdAndNameOrderByTimestampDesc(id: Int, name: String): ScoreUpdate?
 
 }
 

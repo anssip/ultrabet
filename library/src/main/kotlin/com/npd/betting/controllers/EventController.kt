@@ -5,7 +5,9 @@ import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.repositories.SportRepository
+import com.npd.betting.services.importer.EventService
 import jakarta.persistence.EntityManager
+import kotlinx.coroutines.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
@@ -13,6 +15,7 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -20,6 +23,7 @@ import java.time.LocalDateTime
 class EventController @Autowired constructor(
   private val eventRepository: EventRepository,
   private val sportRepository: SportRepository,
+  private val eventService: EventService,
   private val entityManager: EntityManager,
   private val scoreUpdatesSink: AccumulatingSink<Event>,
   private val eventStatusUpdatesSink: AccumulatingSink<Event>
@@ -85,6 +89,11 @@ class EventController @Autowired constructor(
     )
     eventRepository.save(event)
     return event
+  }
+
+  @SchemaMapping(typeName = "Mutation", field = "updateResult")
+  fun updateResult(@Argument("eventId") eventId: Int) {
+    eventService.updateResult(eventId)
   }
 
   @SubscriptionMapping

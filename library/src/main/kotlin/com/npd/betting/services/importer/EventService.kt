@@ -14,15 +14,20 @@ import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Service
+@Transactional
 class EventService(
   private val props: Props,
   private val eventRepository: EventRepository,
   private val marketRepository: MarketRepository,
+  private val betRepository: BetRepository,
+  private val betOptionRepository: BetOptionRepository,
   private val marketOptionRepository: MarketOptionRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
   private val sportRepository: SportRepository,
@@ -69,9 +74,8 @@ class EventService(
   ) {
 
     val event = if (update) {
-      val existing = withContext(Dispatchers.IO) {
-        eventRepository.findByExternalId(eventData.id)
-      }
+      val existing = eventRepository.findByExternalId(eventData.id)
+
         ?: throw Exception("Event ${eventData.id} does not exist")
       logger.info("Updating event ${eventData.id}: ${eventData.home_team} vs ${eventData.away_team}")
       existing.isLive = eventData.isLive()
@@ -80,13 +84,12 @@ class EventService(
       existing.awayTeamName = eventData.away_team
 
       if (existing.completed!!) {
-        updateWithResult(existing)
+        updateScores(existing)
+        withContext(Dispatchers.IO) {
+          updateEventResult(existing)
+        }
       }
-      withContext(Dispatchers.IO) {
-        eventRepository.save(
-          existing
-        )
-      }
+      eventRepository.save(existing)
     } else {
       val sportEntity = withContext(Dispatchers.IO) {
         sportRepository.findByKey(eventData.sport_key)
@@ -107,7 +110,10 @@ class EventService(
         newEvent.completed = eventData.completed ?: newEvent.completed
       }
       if (eventData.completed!!) {
-        updateWithResult(newEvent)
+        updateScores(newEvent)
+        withContext(Dispatchers.IO) {
+          updateEventResult(newEvent)
+        }
       }
       withContext(Dispatchers.IO) {
         eventRepository.save(
@@ -276,17 +282,75 @@ class EventService(
       eventRepository.save(event)
     }
     if (event.completed!!) {
-      updateWithResult(event)
+      updateScores(event)
+      withContext(Dispatchers.IO) {
+        updateEventResult(event)
+      }
+      withContext(Dispatchers.IO) {
+        emitEventStatusUpdate(event)
+      }
     }
-    emitEventStatusUpdate(event)
   }
 
-  private suspend fun updateWithResult(event: Event) {
+  @Transactional
+  fun updateResult(eventId: Int) {
+    val event =
+      eventRepository.findById(eventId).getOrNull()
+        ?: throw Error("Cannot find event with id $eventId")
+    updateEventResult(event)
+  }
+
+  @Transactional
+  fun updateEventResult(event: Event) {
+    val h2hMarket: Market? = event.markets.find { it.name == "h2h" }
+    if (h2hMarket != null) {
+      val homeTeamScore =
+        scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.homeTeamName)
+      val awayTeamScore =
+        scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.awayTeamName)
+
+      val winner: EventResult = when {
+        (homeTeamScore?.score?.toInt() ?: 0) > (awayTeamScore?.score?.toInt() ?: 0) -> EventResult.HOME_TEAM_WIN
+        (homeTeamScore?.score?.toInt() ?: 0) < (awayTeamScore?.score?.toInt() ?: 0) -> EventResult.AWAY_TEAM_WIN
+        else -> EventResult.DRAW
+      }
+      event.completed = true
+      event.result = winner
+      eventRepository.save(event)
+
+      val winningMarketOption: MarketOption? = h2hMarket.options.find {
+        it.name == when (winner) {
+          EventResult.HOME_TEAM_WIN -> event.homeTeamName
+          EventResult.AWAY_TEAM_WIN -> event.awayTeamName
+          else -> "Draw"
+        }
+      }
+      if (winningMarketOption != null) {
+        betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+
+        val losingMarketOptions = h2hMarket.options.filter { it.name != winningMarketOption.name }
+        losingMarketOptions.forEach {
+          betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
+        }
+      } else {
+        throw Error("Winning market option not found")
+      }
+    }
+    betOptionRepository.flush()
+    betRepository.updateAllWinning()
+    betRepository.flush()
+    betRepository.updateAllLosing()
+  }
+
+
+  suspend fun updateScores(event: Event) {
     logger.info("Event ${event.id} is completed, fetching final scores")
     val eventDataWithScores = fetchEventScores(event)
+    logger.info("saving final scores for event ${event.id}")
     if (eventDataWithScores != null) {
-      logger.info("saving final scores for event ${event.id}")
-      saveScores(eventDataWithScores, event)
+      withContext(Dispatchers.IO) {
+        saveScores(eventDataWithScores, event)
+      }
     }
   }
 

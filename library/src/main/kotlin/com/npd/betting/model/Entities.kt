@@ -75,6 +75,12 @@ enum class TransactionType {
   BET_REFUNDED
 }
 
+enum class EventResult {
+  HOME_TEAM_WIN,
+  DRAW,
+  AWAY_TEAM_WIN
+}
+
 @Entity
 @Table(name = "events")
 data class Event(
@@ -111,7 +117,11 @@ data class Event(
   val markets: List<Market> = emptyList(),
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-  val scoreUpdates: MutableList<ScoreUpdate> = mutableListOf()
+  val scoreUpdates: MutableList<ScoreUpdate> = mutableListOf(),
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "result")
+  var result: EventResult? = null
 )
 
 @Entity
@@ -240,8 +250,16 @@ data class Bet(
 
   @Column(name = "created_at", nullable = false)
   var createdAt: Timestamp,
-  ) {
-  constructor(user: User, stake: BigDecimal, status: BetStatus) : this(user, stake, status, mutableListOf(), null, Timestamp(System.currentTimeMillis()))
+
+) {
+  constructor(user: User, stake: BigDecimal, status: BetStatus) : this(
+    user,
+    stake,
+    status,
+    mutableListOf(),
+    null,
+    Timestamp(System.currentTimeMillis())
+  )
 
   fun calculatePotentialWinnings(): BigDecimal {
     return betOptions.fold(stake) { total, betOption ->
@@ -274,6 +292,10 @@ data class BetOption(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Int? = null,
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status")
+  var status: BetStatus? = BetStatus.PENDING,
 )
 
 
