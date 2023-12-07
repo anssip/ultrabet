@@ -4,6 +4,9 @@ This is a sports betting backend implemented in Kotlin and Spring Boot. It featu
 
 This is a work in progress. It is not yet ready for production use yet.
 
+This apps fetches live and pre-match odds from [bets-api.com](https://the-odds-api.com/?ref=ultrabet). 
+Register with them using my referral link to support this project.
+
 ## Demo
 
 Demo betting frontend: https://www.parabolicbet.com/
