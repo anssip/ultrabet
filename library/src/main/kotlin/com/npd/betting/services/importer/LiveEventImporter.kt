@@ -41,10 +41,10 @@ open class LiveEventImporter(
     val liveEvents = withContext(Dispatchers.IO) {
       eventRepository.findByIsLiveTrueAndCompletedFalse()
     }
-    logger.debug("Found ${liveEvents.size} live events")
+    logger.info("Found ${liveEvents.size} live events")
 
     val eventData = fetchEvents(liveEvents)
-    logger.debug("Fetched ${eventData.size} events from bets-api.com")
+    logger.info("Fetched ${eventData.size} events from bets-api.com")
 
     val notfound = eventData.mapNotNull { it.second }
     notfound.forEach() {
