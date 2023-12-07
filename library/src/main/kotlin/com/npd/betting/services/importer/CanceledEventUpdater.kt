@@ -11,7 +11,8 @@ import java.util.*
 
 @Component
 open class CanceledEventUpdater(
-  private val eventRepository: EventRepository
+  private val eventRepository: EventRepository,
+  private val eventService: EventService
 ) {
   val logger: Logger = LoggerFactory.getLogger(CanceledEventUpdater::class.java)
 
@@ -37,6 +38,7 @@ open class CanceledEventUpdater(
         logger.debug("Event ${event.id} is more than 24 hours old, marking as completed")
         event.completed = true
         eventRepository.save(event)
+        eventService.updateEventResult(event)
       }
     }
   }
