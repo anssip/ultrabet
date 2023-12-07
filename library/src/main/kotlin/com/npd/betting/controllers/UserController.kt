@@ -4,6 +4,7 @@ import com.npd.betting.model.Bet
 import com.npd.betting.model.User
 import com.npd.betting.model.Wallet
 import com.npd.betting.repositories.UserRepository
+import com.npd.betting.services.UserService
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
@@ -15,12 +16,14 @@ import java.math.BigDecimal
 @Controller
 class UserController @Autowired constructor(
     private val userRepository: UserRepository,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
+    private val userService: UserService
 ) {
 
-    @SchemaMapping(typeName = "Query", field = "getUser")
-    fun getUser(@Argument id: Int): User {
-        return userRepository.findById(id).orElse(null)
+    @SchemaMapping(typeName = "Query", field = "me")
+    fun me(): User {
+        val user = userService.findAuthenticatedUser()
+        return userRepository.findById(user.id).orElse(null)
     }
 
     @SchemaMapping(typeName = "User", field = "bets")
@@ -35,10 +38,7 @@ class UserController @Autowired constructor(
 
     @MutationMapping
     fun createUser(@Argument externalId: String, @Argument username: String? = null, @Argument email: String?): User {
-        val user = User(username = username, email = email, externalId = externalId)
-        val wallet = Wallet(user = user, balance = BigDecimal.ZERO)
-        user.wallet = wallet
-        userRepository.save(user)
-        return user
+        return userService.createUser(externalId, username, email, BigDecimal(0))
+
     }
 }

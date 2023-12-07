@@ -2,8 +2,9 @@ scalar DateTime
 
 type User {
     id: ID!
-    username: String!
-    email: String!
+    externalId: String
+    username: String
+    email: String
     wallet: Wallet
     bets: [Bet]
 }
@@ -134,7 +135,6 @@ type Bet {
 
 type Wallet {
     id: ID!
-    userId: ID!
     user: User
     balance: Float!
     transactions: [Transaction]
@@ -187,7 +187,7 @@ input BetOptionInput {
 # Queries
 
 type Query {
-    getUser(id: ID!): User
+    me: User
     getEvent(id: ID!): Event
     listEvents: [Event]
     getMarket(id: ID!): Market
@@ -199,6 +199,7 @@ type Query {
     listLiveMarkets(eventId: ID!): [Market]
 
     # TODO: admin queries, should use pagination
+#    getUser(id: ID!): User
     # listUsers: [User]
     # listBets: [Bet]
 }

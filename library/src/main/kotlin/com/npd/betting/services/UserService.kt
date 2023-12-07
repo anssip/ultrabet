@@ -9,6 +9,7 @@ import com.npd.betting.services.importer.EventImporter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
@@ -18,7 +19,6 @@ import java.math.BigDecimal
 class UserService @Autowired constructor(
   val userRepository: UserRepository,
   val walletRepository: WalletRepository,
-  val userController: UserController
 ) {
   val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
 
@@ -29,18 +29,18 @@ class UserService @Autowired constructor(
     val user = userRepository.findByExternalId(sub)
     if (user == null) {
       logger.info("creating new user for externalId ${sub}");
-      return createUser(sub)
+      return createUser(externalId = sub, balance = BigDecimal(1000))
     }
     logger.info("found user ${user.id}")
     return user
   }
 
-  private fun createUser(sub: String): User {
-    val user = userController.createUser(externalId = sub, email = null, username = null)
+  fun createUser(externalId: String, username: String? = null, email: String? = null, balance: BigDecimal): User {
+    val user = User(username = username, email = email, externalId = externalId)
+    val wallet = Wallet(user = user, balance = balance)
+    user.wallet = wallet
 
-    // make sure he has money :-)
-    val wallet = walletRepository.findByUserId(user.id)
-    wallet!!.balance = BigDecimal("1000.00")
+    userRepository.save(user)
     walletRepository.save(wallet)
 
     return user
