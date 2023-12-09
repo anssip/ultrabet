@@ -302,39 +302,43 @@ class EventService(
 
   @Transactional
   fun updateEventResult(event: Event) {
+    logger.info("Updating result for event ${event.id}")
     val h2hMarket: Market? = event.markets.find { it.name == "h2h" }
-    if (h2hMarket != null) {
-      val homeTeamScore =
-        scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.homeTeamName)
-      val awayTeamScore =
-        scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.awayTeamName)
+    if (h2hMarket == null) {
+      logger.info("Cannot find h2h market for event with id ${event.id}")
+      return
+    }
 
-      val winner: EventResult = when {
-        (homeTeamScore?.score?.toInt() ?: 0) > (awayTeamScore?.score?.toInt() ?: 0) -> EventResult.HOME_TEAM_WIN
-        (homeTeamScore?.score?.toInt() ?: 0) < (awayTeamScore?.score?.toInt() ?: 0) -> EventResult.AWAY_TEAM_WIN
-        else -> EventResult.DRAW
-      }
-      event.completed = true
-      event.result = winner
-      eventRepository.save(event)
+    val homeTeamScore =
+      scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.homeTeamName)
+    val awayTeamScore =
+      scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.awayTeamName)
 
-      val winningMarketOption: MarketOption? = h2hMarket.options.find {
-        it.name == when (winner) {
-          EventResult.HOME_TEAM_WIN -> event.homeTeamName
-          EventResult.AWAY_TEAM_WIN -> event.awayTeamName
-          else -> "Draw"
-        }
-      }
-      if (winningMarketOption != null) {
-        betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+    val winner: EventResult = when {
+      (homeTeamScore?.score?.toInt() ?: 0) > (awayTeamScore?.score?.toInt() ?: 0) -> EventResult.HOME_TEAM_WIN
+      (homeTeamScore?.score?.toInt() ?: 0) < (awayTeamScore?.score?.toInt() ?: 0) -> EventResult.AWAY_TEAM_WIN
+      else -> EventResult.DRAW
+    }
+    event.completed = true
+    event.result = winner
+    eventRepository.save(event)
 
-        val losingMarketOptions = h2hMarket.options.filter { it.name != winningMarketOption.name }
-        losingMarketOptions.forEach {
-          betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
-        }
-      } else {
-        throw Error("Winning market option not found")
+    val winningMarketOption: MarketOption? = h2hMarket.options.find {
+      it.name == when (winner) {
+        EventResult.HOME_TEAM_WIN -> event.homeTeamName
+        EventResult.AWAY_TEAM_WIN -> event.awayTeamName
+        else -> "Draw"
       }
+    }
+    if (winningMarketOption != null) {
+      betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+
+      val losingMarketOptions = h2hMarket.options.filter { it.name != winningMarketOption.name }
+      losingMarketOptions.forEach {
+        betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
+      }
+    } else {
+      throw Error("Winning market option not found for market with id ${h2hMarket.id}")
     }
     betOptionRepository.flush()
     betRepository.updateAllWinning()
