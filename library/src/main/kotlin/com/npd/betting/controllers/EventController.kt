@@ -5,9 +5,8 @@ import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.repositories.SportRepository
-import com.npd.betting.services.importer.EventService
+import com.npd.betting.services.EventService
 import jakarta.persistence.EntityManager
-import kotlinx.coroutines.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
@@ -15,7 +14,6 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.sql.Timestamp
 import java.time.LocalDateTime
 

@@ -3,6 +3,7 @@ package com.npd.betting.services.importer
 import com.npd.betting.Props
 import com.npd.betting.model.Event
 import com.npd.betting.repositories.EventRepository
+import com.npd.betting.services.EventService
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

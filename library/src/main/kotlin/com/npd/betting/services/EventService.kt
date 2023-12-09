@@ -1,9 +1,10 @@
-package com.npd.betting.services.importer
+package com.npd.betting.services
 
 import com.npd.betting.Props
 import com.npd.betting.controllers.AccumulatingSink
 import com.npd.betting.model.*
 import com.npd.betting.repositories.*
+import com.npd.betting.services.importer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -24,10 +25,9 @@ import kotlin.jvm.optionals.getOrNull
 @Transactional
 class EventService(
   private val props: Props,
+  private val betService: BetService,
   private val eventRepository: EventRepository,
   private val marketRepository: MarketRepository,
-  private val betRepository: BetRepository,
-  private val betOptionRepository: BetOptionRepository,
   private val marketOptionRepository: MarketOptionRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
   private val sportRepository: SportRepository,
@@ -323,29 +323,8 @@ class EventService(
     event.result = winner
     eventRepository.save(event)
 
-    val winningMarketOption: MarketOption? = h2hMarket.options.find {
-      it.name == when (winner) {
-        EventResult.HOME_TEAM_WIN -> event.homeTeamName
-        EventResult.AWAY_TEAM_WIN -> event.awayTeamName
-        else -> "Draw"
-      }
-    }
-    if (winningMarketOption != null) {
-      betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
-
-      val losingMarketOptions = h2hMarket.options.filter { it.name != winningMarketOption.name }
-      losingMarketOptions.forEach {
-        betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
-      }
-    } else {
-      throw Error("Winning market option not found for market with id ${h2hMarket.id}")
-    }
-    betOptionRepository.flush()
-    betRepository.updateAllWinning()
-    betRepository.flush()
-    betRepository.updateAllLosing()
+    betService.setResults(event, h2hMarket, winner)
   }
-
 
   suspend fun updateScores(event: Event) {
     logger.info("Event ${event.id} is completed, fetching final scores")

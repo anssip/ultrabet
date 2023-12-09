@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
 
@@ -32,6 +33,13 @@ interface BetRepository : JpaRepository<Bet, Int> {
     "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.PENDING) " +
     "AND 0 < (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.LOST)")
   fun updateAllLosing()
+
+  @Query("SELECT b FROM Bet b WHERE b.status = com.npd.betting.model.BetStatus.PENDING AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)")
+  fun findAllWinning(marketOptionId: Int): List<Bet>
+
+  @Query("SELECT b FROM Bet b WHERE b.status = :currentStatus " +
+    "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)")
+  fun findBetsWithWinningOptions(currentStatus: BetStatus): List<Bet>
 }
 
 @Repository

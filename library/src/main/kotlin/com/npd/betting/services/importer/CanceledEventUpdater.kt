@@ -1,6 +1,7 @@
 package com.npd.betting.services.importer
 
 import com.npd.betting.repositories.EventRepository
+import com.npd.betting.services.EventService
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

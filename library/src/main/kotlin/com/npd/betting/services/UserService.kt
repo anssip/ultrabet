@@ -20,7 +20,7 @@ class UserService @Autowired constructor(
   val userRepository: UserRepository,
   val walletRepository: WalletRepository,
 ) {
-  val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
+  val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
 
   fun findAuthenticatedUser(): User {
     val principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal() as Jwt;
