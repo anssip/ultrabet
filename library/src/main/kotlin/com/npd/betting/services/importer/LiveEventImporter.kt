@@ -30,7 +30,7 @@ open class LiveEventImporter(
     return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&bookmakers=bet365,betfair,unibet_eu,betclic&dateFormat=unix&apiKey=${props.getOddsApiKey()}"
   }
 
-  @Scheduled(fixedDelay = 60, timeUnit = java.util.concurrent.TimeUnit.SECONDS)
+  @Scheduled(fixedDelay = 3, timeUnit = java.util.concurrent.TimeUnit.MINUTES)
   @Transactional
   open fun import() {
     runBlocking {
