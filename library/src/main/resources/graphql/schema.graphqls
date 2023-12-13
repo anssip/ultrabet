@@ -112,14 +112,7 @@ type BetOption {
     id: Int!
     bet: Bet!
     marketOption: MarketOption!
-    result: BetResult
-}
-
-enum BetResult {
-    PENDING
-    WON
-    LOST
-    CANCELED
+    status: BetStatus
 }
 
 type Bet {
@@ -130,7 +123,6 @@ type Bet {
     potentialWinnings: Float!
     createdAt: String!
     status: BetStatus!
-    result: BetResult
 }
 
 type Wallet {
