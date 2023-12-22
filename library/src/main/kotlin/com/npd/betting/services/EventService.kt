@@ -56,6 +56,12 @@ class EventService(
         if (existing.isLive != eventData.isLive() || existing.completed != eventData.completed) {
           existing.isLive = eventData.isLive()
           existing.completed = eventData.completed ?: existing.completed
+          if (existing.completed == true) {
+            updateScores(existing)
+            withContext(Dispatchers.IO) {
+              updateEventResult(existing)
+            }
+          }
           val saved = eventRepository.save(existing)
           logger.info("Event ${saved.id} is now ${if (saved.isLive) "live" else "not live"}. Emitting...")
           eventStatusUpdatesSink.emit(saved)
@@ -83,7 +89,7 @@ class EventService(
       existing.homeTeamName = eventData.home_team
       existing.awayTeamName = eventData.away_team
 
-      if (existing.completed!!) {
+      if (existing.completed == true) {
         updateScores(existing)
         withContext(Dispatchers.IO) {
           updateEventResult(existing)
@@ -109,7 +115,7 @@ class EventService(
       if (eventData.completed != null) {
         newEvent.completed = eventData.completed ?: newEvent.completed
       }
-      if (eventData.completed!!) {
+      if (newEvent.completed!!) {
         updateScores(newEvent)
         withContext(Dispatchers.IO) {
           updateEventResult(newEvent)
