@@ -38,11 +38,14 @@ class BetService(
       losingMarketOptions.forEach {
         betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
       }
-    } else {
-      logger.warn("Winning market option for winner '${winner.name}' not found for market with id ${h2hMarket.id}")
-      return
-    }
     betOptionRepository.flush()
+    } else {
+      logger.warn("Winning market option for winner '${winner.name}' not found for market with id ${h2hMarket.id}. All bets will loose!")
+
+      h2hMarket.options.forEach {
+        betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
+      }
+    }
 
     val winningBets = betRepository.findBetsWithWinningOptions(BetStatus.PENDING)
     logger.info("Found ${winningBets.size} winning bets")
@@ -54,7 +57,6 @@ class BetService(
       wallet.balance += it.calculatePotentialWinnings()
       walletRepository.save(wallet)
     }
-
     betRepository.updateAllLosing()
   }
 

@@ -2,7 +2,9 @@ package com.npd.betting.services.importer
 
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.services.EventService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -27,8 +29,10 @@ open class CanceledEventUpdater(
   }
 
 
-  fun updateNonStartedOldEvents() {
-    val events = eventRepository.findByIsLiveFalseAndCompletedFalse()
+  suspend fun updateNonStartedOldEvents() {
+    val events = withContext(Dispatchers.IO) {
+      eventRepository.findByIsLiveFalseAndCompletedFalse()
+    }
     events.forEach() {
       val event = it
       val now = Date().time
@@ -38,7 +42,7 @@ open class CanceledEventUpdater(
       if (diffInHours > 24) {
         logger.debug("Event ${event.id} is more than 24 hours old, marking as completed")
         event.completed = true
-        eventRepository.save(event)
+        eventService.updateScores(event)
         eventService.updateEventResult(event)
       }
     }
