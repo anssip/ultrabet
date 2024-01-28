@@ -32,9 +32,12 @@ class BetService(
       }
     }
     if (winningMarketOption != null) {
-      betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+      logger.info("Winning market option has id '${winningMarketOption.id}' Updating all bet options having this market option with status WON")
+      val result = betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+      logger.info("Updated ${result.toString()} bet options")
 
       val losingMarketOptions = h2hMarket.options.filter { it.name != winningMarketOption.name }
+      logger.info("Updating all bet options having these market options with status LOST: ${losingMarketOptions.map { it.id }}")
       losingMarketOptions.forEach {
         betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
       }

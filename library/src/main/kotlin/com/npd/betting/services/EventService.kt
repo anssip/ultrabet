@@ -309,10 +309,12 @@ class EventService(
   @Transactional
   fun updateEventResult(event: Event) {
     logger.info("Updating result for event ${event.id}")
-    val h2hMarket: Market? = event.markets.find { it.name == "h2h" }
-    if (h2hMarket == null) {
+    val h2hMarkets = event.markets.filter { it.name == "h2h" }
+    if (h2hMarkets.isEmpty()) {
       logger.info("Cannot find h2h market for event with id ${event.id}")
       return
+    } else {
+      logger.info("Found h2h markets ${h2hMarkets.map { it.id }} for event with id ${event.id}")
     }
 
     val homeTeamScore =
@@ -329,7 +331,9 @@ class EventService(
     event.result = winner
     eventRepository.save(event)
 
-    betService.setResults(event, h2hMarket, winner)
+    h2hMarkets.forEach { h2hMarket ->
+      betService.setResults(event, h2hMarket, winner)
+    }
   }
 
   suspend fun updateScores(event: Event) {
