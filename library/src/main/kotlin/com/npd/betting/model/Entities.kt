@@ -113,7 +113,7 @@ data class Event(
   @JoinColumn(name = "sport")
   val sport: Sport,
 
-  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
+  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
   val markets: List<Market> = emptyList(),
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)

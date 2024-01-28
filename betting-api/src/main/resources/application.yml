@@ -4,9 +4,10 @@ spring:
   application:
     name: parabolic-betting-api
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/betting1}
-    username: ${DB_USERNAME:betadmin}
-    password: ${DB_PASSWORD:asdf123_}
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: postgres
+    password: ${DATABASE_PASSWORD}
     hikari:
       maximum-pool-size=6
       minimum-idle=4
@@ -19,7 +20,7 @@ spring:
         format_sql:
           true
   graphql:
-    path: /private/graphql
+    path: /graphql
     cors:
       allowed-origins: '*'
       allowed-methods: '*'
@@ -28,7 +29,7 @@ spring:
         enabled: true
     graphiql:
       enabled: true
-      path: /private/graphiql
+      path: /graphiql
   security:
     oauth2:
       resourceserver:
@@ -37,7 +38,7 @@ spring:
 management:
   endpoints:
     web:
-      base-path: /private/actuator
+      base-path: /actuator
       exposure:
         include: health,metrics,info
 logging:

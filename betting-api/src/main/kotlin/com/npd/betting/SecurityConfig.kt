@@ -22,8 +22,8 @@ open class SecurityConfig {
       .authorizeHttpRequests(
         Customizer { authorize ->
           authorize
-            .requestMatchers("/private/actuator/health").permitAll()
-            .requestMatchers("/private/graphql").authenticated()
+            .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers("/graphql").authenticated()
         }
       )
       .cors(Customizer.withDefaults())

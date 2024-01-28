@@ -13,6 +13,22 @@ Demo betting frontend: https://www.parabolicbet.com/
 
 The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssip/ultrabet-ui)
 
+## Deployment
+
+The two applications are deployed to Fly.io
+
+To deploy the application that polls odds-api and provides the public API, run:
+
+```bash
+flyctl deploy -c application/fly.toml
+```
+
+To deploy the application that provides the private betting API, run:
+
+```bash
+flyctl deploy -c betting-api/fly.toml
+```
+
 # TODO
 
 - [x] Set results to bets

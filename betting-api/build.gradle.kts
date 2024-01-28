@@ -48,7 +48,7 @@ dependencies {
   implementation("com.auth0:jwks-rsa:0.22.1")
 
   implementation(project(":library"))
-  runtimeOnly("com.mysql:mysql-connector-j")
+  runtimeOnly("org.postgresql:postgresql:42.5.4")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

@@ -42,7 +42,7 @@ dependencies {
   implementation("com.graphql-java:graphql-spring-boot-starter:5.0.2")
 
   implementation(project(":library"))
-  runtimeOnly("com.mysql:mysql-connector-j")
+  runtimeOnly("org.postgresql:postgresql:42.5.4")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

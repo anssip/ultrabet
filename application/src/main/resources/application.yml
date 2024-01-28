@@ -4,9 +4,10 @@ spring:
   application:
     name: parabolic-bet-backend
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/betting1}
-    username: ${DB_USERNAME:betadmin}
-    password: ${DB_PASSWORD:asdf123_}
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: postgres
+    password: ${DATABASE_PASSWORD}
     hikari:
       maximum-pool-size=6
       minimum-idle=4
