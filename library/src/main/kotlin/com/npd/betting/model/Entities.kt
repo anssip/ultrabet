@@ -176,7 +176,7 @@ data class Market(
   @JoinColumn(name = "event_id")
   val event: Event,
 
-  @OneToMany(mappedBy = "market", cascade = [CascadeType.ALL])
+  @OneToMany(mappedBy = "market", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
   val options: List<MarketOption> = emptyList()
 )
 
