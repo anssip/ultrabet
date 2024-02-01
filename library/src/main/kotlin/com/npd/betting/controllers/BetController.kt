@@ -3,10 +3,7 @@ package com.npd.betting.controllers
 import com.npd.betting.model.Bet
 import com.npd.betting.model.BetOption
 import com.npd.betting.model.BetStatus
-import com.npd.betting.repositories.BetOptionRepository
-import com.npd.betting.repositories.BetRepository
-import com.npd.betting.repositories.MarketOptionRepository
-import com.npd.betting.repositories.UserRepository
+import com.npd.betting.repositories.*
 import com.npd.betting.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
@@ -32,6 +29,7 @@ open class BetController @Autowired constructor(
   private val userRepository: UserRepository,
   private val marketOptionRepository: MarketOptionRepository,
   private val betOptionRepository: BetOptionRepository,
+  private val walletRepository: WalletRepository,
   private val userService: UserService
 ) {
 
@@ -85,6 +83,7 @@ open class BetController @Autowired constructor(
 
     user.wallet.let { wallet ->
       wallet!!.balance -= stake
+      walletRepository.save(wallet!!)
     }
     return savedBet
   }
@@ -116,6 +115,7 @@ open class BetController @Autowired constructor(
           throw InsufficientFundsException("Insufficient funds")
         }
         wallet.balance -= option.stake
+        walletRepository.save(wallet)
       }
 
       val betOption = BetOption(savedBet, marketOption.get()) // Use the savedBet with the generated ID
