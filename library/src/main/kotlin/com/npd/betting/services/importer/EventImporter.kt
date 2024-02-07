@@ -69,7 +69,9 @@ data class MarketData(
 @Serializable
 data class MarketOptionData(
   val name: String,
-  val price: Double
+  val price: Double,
+  val point: Double? = null,
+  val description: String? = null
 )
 
 
@@ -79,15 +81,15 @@ open class EventImporter(private val props: Props, private val service: EventSer
 
   companion object {
     const val API_BASE = "https://api.the-odds-api.com/v4/"
-    const val MARKETS = "h2h"
-    private const val BOOKMAKERS = "bet365,betfair,unibet_eu,betclic"
+    const val MARKETS = "h2h,totals"
+//    const val BOOKMAKERS = "bet365,betfair,unibet_eu,betclic,unibet,draftkings"
 
     fun getEventsUrl(apiKey: String): String {
-      return "$API_BASE/sports/upcoming/odds/?markets=$MARKETS&bookmakers=$BOOKMAKERS&dateFormat=unix&apiKey=$apiKey"
+      return "$API_BASE/sports/upcoming/odds/?markets=$MARKETS&regions=eu&dateFormat=unix&apiKey=$apiKey"
     }
 
     fun getSportsUrl(apiKey: String): String {
-      return "$API_BASE/sports/?apiKey=$apiKey"
+      return "$API_BASE/sports/?all=true&apiKey=$apiKey"
     }
   }
 

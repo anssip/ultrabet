@@ -27,7 +27,7 @@ open class LiveEventImporter(
   val logger: Logger = LoggerFactory.getLogger(EventImporter::class.java)
 
   fun getEventApiURL(sport: String, eventId: String): String {
-    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=h2h&bookmakers=bet365,betfair,unibet_eu,betclic&dateFormat=unix&apiKey=${props.getOddsApiKey()}"
+    return "${EventImporter.API_BASE}/sports/$sport/events/$eventId/odds/?&markets=${EventImporter.MARKETS}&regions=eu&dateFormat=unix&apiKey=${props.getOddsApiKey()}"
   }
 
   @Scheduled(fixedDelay = 3, timeUnit = java.util.concurrent.TimeUnit.MINUTES)

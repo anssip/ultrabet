@@ -162,6 +162,8 @@ class EventService(
 
       if (existingMarketOption != null && existingMarketOption.odds != BigDecimal(marketOptionData.price)) {
         existingMarketOption.odds = BigDecimal(marketOptionData.price)
+        existingMarketOption.point = marketOptionData.point?.let { BigDecimal(it) }
+        existingMarketOption.description = marketOptionData.description
         existingMarketOption.lastUpdated = Timestamp(marketData.last_update * 1000)
         logger.info("Event ${event.id}, market ${marketData.key}, source: ${existingMarket.source}, option ${marketOptionData.name} has been updated")
         marketOptionSink.emit(existingMarketOption)
@@ -190,6 +192,8 @@ class EventService(
       val marketOption = MarketOption(
         name = marketOptionData.name,
         odds = BigDecimal(marketOptionData.price),
+        point = marketOptionData.point?.let { BigDecimal(it) },
+        description = marketOptionData.description,
         market = savedMarket,
         lastUpdated = Timestamp(marketData.last_update * 1000)
       )

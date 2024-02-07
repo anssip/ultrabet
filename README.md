@@ -31,6 +31,7 @@ flyctl deploy -c betting-api/fly.toml
 
 # TODO
 
+- [x] Add another market type: over/under for example
 - [x] Set results to bets
 - [x] pay out winnings 
 - [x] Add a 2nd application (gradle subproject) that contains a secured GraphQL API for placing bets and other actions that require authentication.

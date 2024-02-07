@@ -196,6 +196,12 @@ data class MarketOption(
   @Column(name = "odds", nullable = false)
   var odds: BigDecimal,
 
+  @Column(name = "point")
+  var point: BigDecimal? = null,
+
+  @Column(name = "description")
+  var description: String? = null,
+
   @ManyToOne
   @JoinColumn(name = "market_id")
   val market: Market,
