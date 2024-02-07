@@ -97,7 +97,9 @@ type MarketOption {
     lastUpdated: String
     name: String!
     odds: Float!
+    point: Float
     market: Market
+    description: String
 }
 
 type ScoreUpdate {
