@@ -310,14 +310,14 @@ class EventService(
       eventRepository.findById(eventId).getOrNull()
         ?: throw Error("Cannot find event with id $eventId")
     saveEventResult(event)
-    saveMatchTotalsResult(event, event.scoreUpdates, true)
+    saveMatchTotalsResult(event, event.scoreUpdates, event.completed == true)
   }
 
   @Transactional
   fun saveEventResult(event: Event) {
     logger.info("Updating result for event ${event.id}")
     saveH2HResult(event)
-    saveMatchTotalsResult(event, event.scoreUpdates, true)
+    saveMatchTotalsResult(event, event.scoreUpdates, event.completed == true)
   }
 
   private fun saveH2HResult(event: Event) {
@@ -377,14 +377,14 @@ class EventService(
       return
     }
     markets.forEach {
-      val over = it?.options?.find { it.name == "Over" }
-      logger.info("total score: $totalScore, over point: ${over?.point}")
-      val result = if (totalScore < over?.point!!.toInt()) {
+      val over = it.options.find { option -> option.name == "Over" }
+      // compare total score with over point as decimal numbers
+      val result = if (totalScore < (over!!.point?.toDouble() ?: 0.0)) {
         EventResult.UNDER
       } else {
         EventResult.OVER
       }
-      logger.info("Totals result for event ${event.id} is ${result.name}")
+      logger.info("Totals result for event ${event.id} is ${result.name}, (total scores: $totalScore, over point: ${over.point}, final result? $isFinalResult)")
       if (isFinalResult || result == EventResult.OVER) {
         // either the game is complete or we already went over the point
         betService.setTotalsResult(event, it, result)

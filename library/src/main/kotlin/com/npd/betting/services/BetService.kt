@@ -77,10 +77,10 @@ class BetService(
     }
     if (winningMarketOption != null) {
       logger.info("Winning market option has id '${winningMarketOption.id}' Updating all bet options having this market option with status WON")
-      val result = betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+      betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
 
       val losingMarketOptions =
-        totalsMarket.options.filter { (it.name == "Under" || it.name == "Over") && it.name != winningMarketOption.name }
+        totalsMarket.options.filter { it.name != winningMarketOption.name }
       logger.info("Updating all bet options having these market options with status LOST: ${losingMarketOptions.map { it.id }}")
       losingMarketOptions.forEach {
         betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
