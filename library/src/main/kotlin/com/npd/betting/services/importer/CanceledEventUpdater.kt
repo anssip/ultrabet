@@ -43,7 +43,7 @@ open class CanceledEventUpdater(
         logger.debug("Event ${event.id} is more than 24 hours old, marking as completed")
         event.completed = true
         eventService.updateScores(event)
-        eventService.updateEventResult(event)
+        eventService.saveEventResult(event)
       }
     }
   }

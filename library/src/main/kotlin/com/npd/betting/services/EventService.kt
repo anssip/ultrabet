@@ -59,7 +59,7 @@ class EventService(
           if (existing.completed == true) {
             updateScores(existing)
             withContext(Dispatchers.IO) {
-              updateEventResult(existing)
+              saveEventResult(existing)
             }
           }
           val saved = eventRepository.save(existing)
@@ -92,7 +92,7 @@ class EventService(
       if (existing.completed == true) {
         updateScores(existing)
         withContext(Dispatchers.IO) {
-          updateEventResult(existing)
+          saveEventResult(existing)
         }
       }
       eventRepository.save(existing)
@@ -118,7 +118,7 @@ class EventService(
       if (newEvent.completed!!) {
         updateScores(newEvent)
         withContext(Dispatchers.IO) {
-          updateEventResult(newEvent)
+          saveEventResult(newEvent)
         }
       }
       withContext(Dispatchers.IO) {
@@ -226,6 +226,8 @@ class EventService(
           scoreUpdateRepository.save(score)
         }
       }
+      val update = eventRepository.findById(event.id).get()
+      saveMatchTotalsResult(update, update.scoreUpdates, false)
     }
   }
 
@@ -294,7 +296,7 @@ class EventService(
     if (event.completed!!) {
       updateScores(event)
       withContext(Dispatchers.IO) {
-        updateEventResult(event)
+        saveEventResult(event)
       }
       withContext(Dispatchers.IO) {
         emitEventStatusUpdate(event)
@@ -307,12 +309,18 @@ class EventService(
     val event =
       eventRepository.findById(eventId).getOrNull()
         ?: throw Error("Cannot find event with id $eventId")
-    updateEventResult(event)
+    saveEventResult(event)
+    saveMatchTotalsResult(event, event.scoreUpdates, true)
   }
 
   @Transactional
-  fun updateEventResult(event: Event) {
+  fun saveEventResult(event: Event) {
     logger.info("Updating result for event ${event.id}")
+    saveH2HResult(event)
+    saveMatchTotalsResult(event, event.scoreUpdates, true)
+  }
+
+  private fun saveH2HResult(event: Event) {
     val h2hMarkets = event.markets.filter { it.name == "h2h" }
     if (h2hMarkets.isEmpty()) {
       logger.info("Cannot find h2h market for event with id ${event.id}")
@@ -336,7 +344,7 @@ class EventService(
     eventRepository.save(event)
 
     h2hMarkets.forEach { h2hMarket ->
-      betService.setResults(event, h2hMarket, winner)
+      betService.setH2HResults(event, h2hMarket, winner)
     }
   }
 
@@ -347,6 +355,39 @@ class EventService(
     if (eventDataWithScores != null) {
       withContext(Dispatchers.IO) {
         saveScores(eventDataWithScores, event)
+      }
+    }
+  }
+
+  @Transactional
+  fun saveMatchTotalsResult(event: Event, scores: List<ScoreUpdate>, isFinalResult: Boolean) {
+    if (scores.isEmpty()) {
+      logger.info("No scores found for event ${event.id}")
+      return
+    }
+    val homeScore =
+      scores.filter { it.name == event.homeTeamName }.maxByOrNull { it.score.toInt() }?.score?.toInt() ?: 0
+    val awayScore =
+      scores.filter { it.name == event.awayTeamName }.maxByOrNull { it.score.toInt() }?.score?.toInt() ?: 0
+
+    val totalScore = homeScore + awayScore
+    val markets = event.markets.filter { it.name == "totals" }
+    if (markets.isEmpty()) {
+      logger.info("No totals market found for event ${event.id}")
+      return
+    }
+    markets.forEach {
+      val over = it?.options?.find { it.name == "Over" }
+      logger.info("total score: $totalScore, over point: ${over?.point}")
+      val result = if (totalScore < over?.point!!.toInt()) {
+        EventResult.UNDER
+      } else {
+        EventResult.OVER
+      }
+      logger.info("Totals result for event ${event.id} is ${result.name}")
+      if (isFinalResult || result == EventResult.OVER) {
+        // either the game is complete or we already went over the point
+        betService.setTotalsResult(event, it, result)
       }
     }
   }

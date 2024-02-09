@@ -18,7 +18,7 @@ class BetService(
 ) {
   val logger: Logger = LoggerFactory.getLogger(BetService::class.java)
 
-  fun setResults(
+  fun setH2HResults(
     event: Event,
     h2hMarket: Market,
     winner: EventResult,
@@ -41,7 +41,7 @@ class BetService(
       losingMarketOptions.forEach {
         betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
       }
-    betOptionRepository.flush()
+      betOptionRepository.flush()
     } else {
       logger.warn("Winning market option for winner '${winner.name}' not found for market with id ${h2hMarket.id}. All bets will loose!")
 
@@ -49,7 +49,10 @@ class BetService(
         betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
       }
     }
+    updateBetsResults()
+  }
 
+  private fun updateBetsResults() {
     val winningBets = betRepository.findBetsWithWinningOptions(BetStatus.PENDING)
     logger.info("Found ${winningBets.size} winning bets")
     winningBets.forEach {
@@ -61,6 +64,30 @@ class BetService(
       walletRepository.save(wallet)
     }
     betRepository.updateAllLosing()
+  }
+
+  fun setTotalsResult(
+    event: Event,
+    totalsMarket: Market,
+    result: EventResult,
+  ) {
+    logger.info("Setting results for event ${event.id} with result ${result.name}")
+    val winningMarketOption: MarketOption? = totalsMarket.options.find {
+      it.name == "Over" && result == EventResult.OVER || it.name == "Under" && result == EventResult.UNDER
+    }
+    if (winningMarketOption != null) {
+      logger.info("Winning market option has id '${winningMarketOption.id}' Updating all bet options having this market option with status WON")
+      val result = betOptionRepository.updateAllByMarketOptionId(winningMarketOption.id, BetStatus.WON)
+
+      val losingMarketOptions =
+        totalsMarket.options.filter { (it.name == "Under" || it.name == "Over") && it.name != winningMarketOption.name }
+      logger.info("Updating all bet options having these market options with status LOST: ${losingMarketOptions.map { it.id }}")
+      losingMarketOptions.forEach {
+        betOptionRepository.updateAllByMarketOptionId(it.id, BetStatus.LOST)
+      }
+      betOptionRepository.flush()
+    }
+    updateBetsResults()
   }
 
 }

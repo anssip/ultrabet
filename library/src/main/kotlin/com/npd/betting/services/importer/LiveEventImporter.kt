@@ -53,6 +53,14 @@ open class LiveEventImporter(
     }
 
     val sports = eventData.mapNotNull { it.first?.sport_key }.distinct()
+    fetchScores(sports, liveEvents, eventData)
+  }
+
+  private suspend fun fetchScores(
+    sports: List<String>,
+    liveEvents: List<Event>,
+    eventData: List<Pair<EventData?, Int?>>
+  ) {
     logger.debug("Fetching scores for $sports sports")
     sports.forEach() {
       val eventsWithScores = service.fetchScores(it)

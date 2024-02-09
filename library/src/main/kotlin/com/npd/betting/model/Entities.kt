@@ -78,7 +78,9 @@ enum class TransactionType {
 enum class EventResult {
   HOME_TEAM_WIN,
   DRAW,
-  AWAY_TEAM_WIN
+  AWAY_TEAM_WIN,
+  OVER,
+  UNDER
 }
 
 @Entity
