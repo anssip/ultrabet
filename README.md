@@ -15,7 +15,12 @@ The frontend codebase is in my [ultrabet-ui repository](https://github.com/anssi
 
 ## Deployment
 
-The two applications are deployed to Fly.io
+This repository contains two applications. The first one is a public GraphQL API that provides odds and other public data.
+It also provides a WebSocket subscription API for live score updates. Finally, it is responsible for fetching the event 
+fixtures, live scores, and odds from the odds-api.com. The second one is a private GraphQL API that provides betting 
+functionality.
+
+The two applications are both deployed to Fly.io
 
 To deploy the application that polls odds-api and provides the public API, run:
 
@@ -29,13 +34,37 @@ To deploy the application that provides the private betting API, run:
 flyctl deploy -c betting-api/fly.toml
 ```
 
+## Roadmap
+
+- Core betting features (ongoing, see TODO below)
+- Bet types
+  - [x] Single ( done)
+  - [x] Parlay (done)
+  - [ ] System
+- Game field live visualization
+- Bet builder Bet365 style
+- Back Office
+  - Risk management (bettors, alerts, limits, etc)
+  - Bet list with voiding
+- Wallet integration
+- Payment gateway integration
+- Multiple languages
+- Commercial skinning
+- Profit
+
 # TODO
 
+- [ ] Spreads (handicap) market with odds fetching and result setting
+- [ ] System bet
+- [ ] Event view that shows all markets and options for an event
+- [ ] Admin queries and mutations
+- [ ] Pagination for bets page
+- [ ] Show all score updates on current score mouse hover (?)
+- [ ] Proper design and styling for the [betting frontend](https://www.parabolicbet.com/)
 - [x] Add another market type: over/under for example
 - [x] Set results to bets
 - [x] pay out winnings 
 - [x] Add a 2nd application (gradle subproject) that contains a secured GraphQL API for placing bets and other actions that require authentication.
-- [ ] Map internal errors to GraphQL errors that show properly in the client 
 - [x] GraphQL subscriptions
 - [x] Make it update market_option.last_updated_at
 - [x] Entities (for JPA)
@@ -43,50 +72,6 @@ flyctl deploy -c betting-api/fly.toml
 - [x] Queries
 - [x] Mutations
 - [x] Import feeds from bets-api.com
-- [ ] Admin queries and mutations
 - [x] Bet should have several MarketOptions (long bet)
 - [x] Deploy somewhere
-- [ ] Pagination TBD when building the UI
-- [ ] add completedEvents query
 - [x] scheduled update of completed events. Canceled events are now left non-completed.
-
-## Major work items
-
-- Live event visualization
-- Bet builder ala Bet365
-- Bet types
-    - Right
-    - Parlay
-    - System
-- Multifeed
-- Back Office
-    - Risk management (alerts, limits, etc)
-    - Bet list with voiding
-    - Player list?
-- Wallet integration
-- Multiple languages
-
-## Event import
-
-- [x] add a 'source' field to the Market entity, to identify the bookmaker. Event.markets edge should be able to filter
-  based on source.
-- [x] import each event only once
-
-### Live events
-
-- [ ] Rename to parabolicbet.com
-- [x] Live events polling should be more frequent than pre-match events
-- [x] Should also request scores when live
-- [ ] Check `completed` field when polling scores. When completed -> set result and pay out winnings
-- [ ] Show all score updates on current score mouse hover
-- [ ] Add results page to show completed events
-
-## Frontend
-
-## Admin
-
-- limits
-- alerts
-- bet invalidations
-
-## Wallet integration
