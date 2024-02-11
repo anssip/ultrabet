@@ -2,6 +2,7 @@ package com.npd.betting.services.importer
 
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.services.EventService
+import com.npd.betting.services.ResultService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -15,7 +16,8 @@ import java.util.*
 @Component
 open class CanceledEventUpdater(
   private val eventRepository: EventRepository,
-  private val eventService: EventService
+  private val eventService: EventService,
+  private val resultService: ResultService
 ) {
   val logger: Logger = LoggerFactory.getLogger(CanceledEventUpdater::class.java)
 
@@ -43,7 +45,7 @@ open class CanceledEventUpdater(
         logger.debug("Event ${event.id} is more than 24 hours old, marking as completed")
         event.completed = true
         eventService.updateScores(event)
-        eventService.saveEventResult(event)
+        resultService.saveEventResult(event)
       }
     }
   }

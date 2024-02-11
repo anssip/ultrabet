@@ -5,7 +5,7 @@ import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.repositories.SportRepository
-import com.npd.betting.services.EventService
+import com.npd.betting.services.ResultService
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 class EventController @Autowired constructor(
   private val eventRepository: EventRepository,
   private val sportRepository: SportRepository,
-  private val eventService: EventService,
+  private val resultService: ResultService,
   private val entityManager: EntityManager,
   private val scoreUpdatesSink: AccumulatingSink<Event>,
   private val eventStatusUpdatesSink: AccumulatingSink<Event>
@@ -91,7 +91,7 @@ class EventController @Autowired constructor(
 
   @SchemaMapping(typeName = "Mutation", field = "updateResult")
   fun updateResult(@Argument("eventId") eventId: Int) {
-    eventService.updateResult(eventId)
+    resultService.updateResult(eventId)
   }
 
   @SubscriptionMapping
