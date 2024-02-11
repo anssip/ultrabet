@@ -361,21 +361,13 @@ class EventService(
 
   @Transactional
   fun saveMatchTotalsResult(event: Event, scores: List<ScoreUpdate>, isFinalResult: Boolean) {
-    if (scores.isEmpty()) {
-      logger.info("No scores found for event ${event.id}")
-      return
-    }
-    val homeScore =
-      scores.filter { it.name == event.homeTeamName }.maxByOrNull { it.score.toInt() }?.score?.toInt() ?: 0
-    val awayScore =
-      scores.filter { it.name == event.awayTeamName }.maxByOrNull { it.score.toInt() }?.score?.toInt() ?: 0
-
-    val totalScore = homeScore + awayScore
     val markets = event.markets.filter { it.name == "totals" }
     if (markets.isEmpty()) {
       logger.info("No totals market found for event ${event.id}")
       return
     }
+    val totalScore = getTotalNumberOfScores(scores, event)
+
     markets.forEach {
       val over = it.options.find { option -> option.name == "Over" }
       // compare total score with over point as decimal numbers
@@ -390,6 +382,21 @@ class EventService(
         betService.setTotalsResult(event, it, result)
       }
     }
+  }
+
+  private fun getTotalNumberOfScores(
+    scores: List<ScoreUpdate>,
+    event: Event
+  ): Int {
+    if (scores.isEmpty()) {
+      logger.info("No scores found for event ${event.id}")
+      return 0
+    }
+    val homeScore =
+      scores.filter { it.name == event.homeTeamName }.maxByOrNull { it.score.toInt() }?.score?.toInt() ?: 0
+    val awayScore =
+      scores.filter { it.name == event.awayTeamName }.maxByOrNull { it.score.toInt() }?.score?.toInt() ?: 0
+    return homeScore + awayScore
   }
 
 }
