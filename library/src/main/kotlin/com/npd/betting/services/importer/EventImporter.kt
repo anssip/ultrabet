@@ -81,8 +81,7 @@ open class EventImporter(private val props: Props, private val service: EventSer
 
   companion object {
     const val API_BASE = "https://api.the-odds-api.com/v4/"
-    const val MARKETS = "h2h,totals"
-//    const val BOOKMAKERS = "bet365,betfair,unibet_eu,betclic,unibet,draftkings"
+    const val MARKETS = "h2h,totals,spreads"
 
     fun getEventsUrl(apiKey: String): String {
       return "$API_BASE/sports/upcoming/odds/?markets=$MARKETS&regions=eu&dateFormat=unix&apiKey=$apiKey"

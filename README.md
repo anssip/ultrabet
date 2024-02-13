@@ -54,7 +54,10 @@ flyctl deploy -c betting-api/fly.toml
 
 # TODO
 
-- [ ] Spreads (handicap) market with odds fetching and result setting
+- [x] Spreads (handicap) market with odds fetching and result setting
+- [ ] Double chance market (calculated from h2h)
+- [ ] Alternative totals market (calculated from totals)
+- [ ] Quarter/half markets
 - [ ] System bet
 - [ ] Event view that shows all markets and options for an event
 - [ ] Admin queries and mutations

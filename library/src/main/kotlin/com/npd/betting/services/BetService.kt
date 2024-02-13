@@ -90,4 +90,8 @@ class BetService(
     updateBetsResults()
   }
 
+  fun setSpreadResult(event: Event, spreadMarket: Market, winner: EventResult) {
+    setH2HResults(event, spreadMarket, winner)
+  }
+
 }

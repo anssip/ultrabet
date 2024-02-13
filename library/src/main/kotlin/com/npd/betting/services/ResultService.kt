@@ -28,13 +28,56 @@ class ResultService(
         ?: throw Error("Cannot find event with id $eventId")
     saveEventResult(event)
     saveMatchTotalsResult(event, event.scoreUpdates, event.completed ?: false)
+
   }
 
   @Transactional
   fun saveEventResult(event: Event) {
     logger.info("Updating result for event ${event.id}")
-    saveH2HResult(event)
+    if (event.completed == true) {
+      saveH2HResult(event)
+      saveSpreadsResult(event)
+    }
     saveMatchTotalsResult(event, event.scoreUpdates, event.completed ?: false)
+  }
+
+  private fun saveSpreadsResult(event: Event) {
+    val spreadMarkets = event.markets.filter { it.name == "spreads" }
+    if (spreadMarkets.isEmpty()) {
+      logger.info("Cannot find spreads market for event with id ${event.id}")
+      return
+    } else {
+      logger.info("Found spreads markets ${spreadMarkets.map { it.id }} for event with id ${event.id}")
+    }
+    spreadMarkets.forEach { spreadMarket ->
+      val homeTeamOption = spreadMarket.options.find { it.name == event.homeTeamName }
+      val awayTeamOption = spreadMarket.options.find { it.name == event.awayTeamName }
+      if (homeTeamOption == null || awayTeamOption == null) {
+        logger.error("Cannot find home or away team option for spread market ${spreadMarket.id}")
+        return
+      }
+      logger.debug(
+        "Found home team option {} with handicap {} and away team option {} with handicap {} for spread market {} for event {}",
+        homeTeamOption.id,
+        homeTeamOption.point,
+        awayTeamOption.id,
+        awayTeamOption.point,
+        spreadMarket.id,
+        event.id
+      )
+      val homeTeamScore =
+        (scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.homeTeamName)?.score?.toInt() ?: 0) + (homeTeamOption.point?.toDouble() ?: 0.0)
+      val awayTeamScore =
+        (scoreUpdateRepository.findFirstByEventIdAndNameOrderByTimestampDesc(event.id, event.awayTeamName)?.score?.toInt() ?: 0) + (awayTeamOption.point?.toDouble() ?: 0.0)
+      logger.debug("Calculated handicapped home team score: $homeTeamScore and away team score: $awayTeamScore for event ${event.id}")
+
+      val winner = when {
+        homeTeamScore > awayTeamScore -> EventResult.HOME_TEAM_WIN
+        homeTeamScore < awayTeamScore -> EventResult.AWAY_TEAM_WIN
+        else -> EventResult.DRAW
+      }
+      betService.setSpreadResult(event, spreadMarket, winner)
+    }
   }
 
   private fun saveH2HResult(event: Event) {
