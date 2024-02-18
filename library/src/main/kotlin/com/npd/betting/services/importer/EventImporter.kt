@@ -92,7 +92,7 @@ open class EventImporter(private val props: Props, private val service: EventSer
     }
   }
 
-  @Scheduled(fixedRate = 10, timeUnit = java.util.concurrent.TimeUnit.MINUTES) // Poll the API every 10 minutes
+  @Scheduled(fixedRate = 30, timeUnit = java.util.concurrent.TimeUnit.MINUTES) // Poll the API every 10 minutes
   @Transactional
   open fun importEvents() {
     runBlocking {
