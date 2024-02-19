@@ -56,6 +56,10 @@ type Sport {
     Does this sport have outright markets?
     """
     hasOutrights: Boolean!
+
+    events: [Event]
+
+    activeEventCount: Int
 }
 
 """
@@ -182,6 +186,7 @@ input BetOptionInput {
 
 type Query {
     me: User
+    listSports: [Sport]
     getEvent(id: ID!): Event
     listEvents: [Event]
     getMarket(id: ID!): Market

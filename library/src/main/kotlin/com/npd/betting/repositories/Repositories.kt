@@ -48,6 +48,10 @@ interface EventRepository : JpaRepository<Event, Int> {
   fun findByIsLiveFalseAndCompletedFalse(): List<Event>
 
   fun findByExternalId(externalId: String): Event?
+
+  fun findBySportIdAndCompletedFalse(sportId: Int): List<Event>
+
+  fun countBySportIdAndCompleted(sportId: Int, completed: Boolean): Int
 }
 
 
@@ -80,4 +84,6 @@ interface ScoreUpdateRepository : JpaRepository<ScoreUpdate, Int> {
 
 interface SportRepository : JpaRepository<Sport, Int> {
   fun findByKey(key: String): Sport?
+
+  fun findByActiveTrue(): List<Sport>
 }

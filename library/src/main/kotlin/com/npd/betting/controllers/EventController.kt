@@ -3,6 +3,7 @@ package com.npd.betting.controllers
 import com.npd.betting.model.Event
 import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
+import com.npd.betting.model.Sport
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.repositories.SportRepository
 import com.npd.betting.services.ResultService
@@ -27,14 +28,24 @@ class EventController @Autowired constructor(
   private val eventStatusUpdatesSink: AccumulatingSink<Event>
 ) {
 
+  @SchemaMapping(typeName = "Query", field = "listSports")
+  fun getSports(): List<Sport> {
+    return sportRepository.findByActiveTrue()
+  }
+
+  @SchemaMapping(typeName = "Sport", field = "events")
+  fun getSportEvents(sport: Sport): List<Event> {
+    return eventRepository.findBySportIdAndCompletedFalse(sport.id)
+  }
+
+  @SchemaMapping(typeName = "Sport", field = "activeEventCount")
+  fun activeEventCount(sport: Sport): Int {
+    return eventRepository.countBySportIdAndCompleted(sport.id, false)
+  }
+
   @SchemaMapping(typeName = "Query", field = "getEvent")
   fun getEvent(@Argument id: Int): Event? {
     return eventRepository.findById(id).orElse(null)
-  }
-
-  @SchemaMapping(typeName = "Query", field = "listEvents")
-  fun listEvents(): List<Event> {
-    return eventRepository.findByIsLiveFalseAndCompletedFalse()
   }
 
   @SchemaMapping(typeName = "Query", field = "listLiveEvents")
