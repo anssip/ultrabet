@@ -47,6 +47,8 @@ interface EventRepository : JpaRepository<Event, Int> {
   fun findByIsLiveTrueAndCompletedFalse(): List<Event>
   fun findByIsLiveFalseAndCompletedFalse(): List<Event>
 
+  fun findByCompletedFalse(): List<Event>
+
   fun findByExternalId(externalId: String): Event?
 
   fun findBySportIdAndCompletedFalse(sportId: Int): List<Event>

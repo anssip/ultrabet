@@ -189,6 +189,7 @@ type Query {
     listSports: [Sport]
     getEvent(id: ID!): Event
     listEvents: [Event]
+    listAllEvents: [Event]
     getMarket(id: ID!): Market
     listMarkets(eventId: ID!): [Market]
     getBet(id: ID!): Bet
