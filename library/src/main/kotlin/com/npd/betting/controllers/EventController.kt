@@ -53,9 +53,9 @@ class EventController @Autowired constructor(
     return eventRepository.findByIsLiveFalseAndCompletedFalse()
   }
 
-  @SchemaMapping(typeName = "Query", field = "listAllEvents")
-  fun listAllEvents(): List<Event> {
-    return eventRepository.findByCompletedFalse()
+  @SchemaMapping(typeName = "Query", field = "eventsBySportGroup")
+  fun eventsBySportGroup(@Argument group: String): List<Event> {
+    return eventRepository.findBySportGroupAndCompletedFalse(group)
   }
 
   @SchemaMapping(typeName = "Query", field = "listLiveEvents")

@@ -188,14 +188,25 @@ type Query {
     me: User
     listSports: [Sport]
     getEvent(id: ID!): Event
+
+    """
+    List upcoming events available for betting.
+    """
     listEvents: [Event]
-    listAllEvents: [Event]
+    """
+    List live events available for betting.
+    """
+    listLiveEvents: [Event]
+    """
+    List events available for betting in the specified sport group. Lists both live an upcoming events.
+    """
+    eventsBySportGroup(group: String!): [Event]
+
     getMarket(id: ID!): Market
     listMarkets(eventId: ID!): [Market]
     getBet(id: ID!): Bet
     listBets: [Bet]
 
-    listLiveEvents: [Event]
     listLiveMarkets(eventId: ID!): [Market]
 
     # TODO: admin queries, should use pagination

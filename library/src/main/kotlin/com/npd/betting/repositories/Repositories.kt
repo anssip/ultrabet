@@ -54,6 +54,9 @@ interface EventRepository : JpaRepository<Event, Int> {
   fun findBySportIdAndCompletedFalse(sportId: Int): List<Event>
 
   fun countBySportIdAndCompleted(sportId: Int, completed: Boolean): Int
+
+  @Query("SELECT e FROM Event e WHERE e.sport.group = :group AND e.completed = false")
+  fun findBySportGroupAndCompletedFalse(group: String): List<Event>
 }
 
 
