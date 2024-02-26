@@ -189,7 +189,12 @@ input BetOptionInput {
 
 type Query {
     me: User
-    listSports: [Sport]
+
+    """
+    List sports by group.
+    """
+    listSports(group: String): [Sport]
+
     getEvent(id: ID!): Event
 
     """

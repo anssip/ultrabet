@@ -91,4 +91,5 @@ interface SportRepository : JpaRepository<Sport, Int> {
   fun findByKey(key: String): Sport?
 
   fun findByActiveTrue(): List<Sport>
+  fun findByGroupAndActiveTrue(group: String): List<Sport>
 }
