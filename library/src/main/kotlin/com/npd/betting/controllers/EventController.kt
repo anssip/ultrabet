@@ -28,21 +28,6 @@ class EventController @Autowired constructor(
   private val eventStatusUpdatesSink: AccumulatingSink<Event>
 ) {
 
-  @SchemaMapping(typeName = "Query", field = "listSports")
-  fun getSports(): List<Sport> {
-    return sportRepository.findByActiveTrue()
-  }
-
-  @SchemaMapping(typeName = "Sport", field = "events")
-  fun getSportEvents(sport: Sport): List<Event> {
-    return eventRepository.findBySportIdAndCompletedFalse(sport.id)
-  }
-
-  @SchemaMapping(typeName = "Sport", field = "activeEventCount")
-  fun activeEventCount(sport: Sport): Int {
-    return eventRepository.countBySportIdAndCompleted(sport.id, false)
-  }
-
   @SchemaMapping(typeName = "Query", field = "getEvent")
   fun getEvent(@Argument id: Int): Event? {
     return eventRepository.findById(id).orElse(null)
@@ -61,6 +46,11 @@ class EventController @Autowired constructor(
   @SchemaMapping(typeName = "Query", field = "listLiveEvents")
   fun listLiveEvents(): List<Event> {
     return eventRepository.findByIsLiveTrueAndCompletedFalse()
+  }
+
+  @SchemaMapping(typeName = "Query", field = "listAllEvents")
+  fun listAllEvents(): List<Event> {
+    return eventRepository.findByCompletedFalse()
   }
 
   @SchemaMapping(typeName = "Event", field = "markets")

@@ -57,6 +57,9 @@ type Sport {
     """
     hasOutrights: Boolean!
 
+    """
+    List all events available for betting in this sport.
+    """
     events: [Event]
 
     activeEventCount: Int
@@ -201,6 +204,10 @@ type Query {
     List events available for betting in the specified sport group. Lists both live an upcoming events.
     """
     eventsBySportGroup(group: String!): [Event]
+    """
+    List all events available for betting. Lists both live an upcoming events.
+    """
+    listAllEvents: [Event]
 
     getMarket(id: ID!): Market
     listMarkets(eventId: ID!): [Market]
