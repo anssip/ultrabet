@@ -36,21 +36,21 @@ flyctl deploy -c betting-api/fly.toml
 
 ## Roadmap
 
-- Core betting features (ongoing, see TODO below)
-- Bet types
+- [ ] Core betting features (ongoing, see TODO below)
+- [ ] Bet types
   - [x] Single ( done)
   - [x] Parlay (done)
   - [ ] System
-- Game field live visualization
-- Bet builder Bet365 style
-- Back Office
+- [ ] Game field live visualization
+- [ ] Bet builder Bet365 style
+- [ ] Back Office
   - Risk management (bettors, alerts, limits, etc)
   - Bet list with voiding
-- Wallet integration
-- Payment gateway integration
-- Multiple languages
-- Commercial skinning
-- Profit
+- [ ] Wallet integration
+- [ ] Payment gateway integration
+- [ ] Multiple languages
+- [ ] Commercial skinning
+- [ ] Profit
 
 # TODO
 
