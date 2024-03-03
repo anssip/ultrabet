@@ -94,9 +94,7 @@ interface ScoreUpdateRepository : JpaRepository<ScoreUpdate, Int> {
 interface SportRepository : JpaRepository<Sport, Int> {
   fun findByKey(key: String): Sport?
 
-  @Query("SELECT s FROM Sport s JOIN FETCH s.events e WHERE e.completed = false AND s.active = true")
   fun findByActiveTrue(): List<Sport>
 
-  @Query("SELECT s FROM Sport s JOIN FETCH s.events e WHERE e.completed = false AND s.group = :group AND s.active = true")
   fun findByGroupAndActiveTrue(group: String): List<Sport>
 }
