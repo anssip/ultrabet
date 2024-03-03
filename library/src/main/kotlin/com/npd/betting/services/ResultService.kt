@@ -4,6 +4,7 @@ import com.npd.betting.model.Event
 import com.npd.betting.model.EventResult
 import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
+import com.npd.betting.repositories.MarketRepository
 import com.npd.betting.repositories.ScoreUpdateRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,7 +17,8 @@ import kotlin.jvm.optionals.getOrNull
 class ResultService(
   private val eventRepository: EventRepository,
   private val scoreUpdateRepository: ScoreUpdateRepository,
-  private val betService: BetService
+  private val betService: BetService,
+  private val marketRepository: MarketRepository
 ) {
   val logger: Logger = LoggerFactory.getLogger(EventService::class.java)
 
@@ -27,7 +29,8 @@ class ResultService(
       eventRepository.findById(eventId).getOrNull()
         ?: throw Error("Cannot find event with id $eventId")
     saveEventResult(event)
-    saveMatchTotalsResult(event, event.scoreUpdates, event.completed ?: false)
+    val scoreUpdates = scoreUpdateRepository.findByEventId(event.id)
+    saveMatchTotalsResult(event, scoreUpdates, event.completed ?: false)
 
   }
 
@@ -38,11 +41,12 @@ class ResultService(
       saveH2HResult(event)
       saveSpreadsResult(event)
     }
-    saveMatchTotalsResult(event, event.scoreUpdates, event.completed ?: false)
+    val scoreUpdates = scoreUpdateRepository.findByEventId(event.id)
+    saveMatchTotalsResult(event, scoreUpdates, event.completed ?: false)
   }
 
   private fun saveSpreadsResult(event: Event) {
-    val spreadMarkets = event.markets.filter { it.name == "spreads" }
+    val spreadMarkets = marketRepository.findByEventId(event.id).filter { it.name == "spreads" }
     if (spreadMarkets.isEmpty()) {
       logger.info("Cannot find spreads market for event with id ${event.id}")
       return
@@ -81,7 +85,7 @@ class ResultService(
   }
 
   private fun saveH2HResult(event: Event) {
-    val h2hMarkets = event.markets.filter { it.name == "h2h" }
+    val h2hMarkets = marketRepository.findByEventId(event.id).filter { it.name == "h2h" }
     if (h2hMarkets.isEmpty()) {
       logger.info("Cannot find h2h market for event with id ${event.id}")
       return
@@ -110,7 +114,7 @@ class ResultService(
 
   @Transactional
   fun saveMatchTotalsResult(event: Event, scores: List<ScoreUpdate>, isFinalResult: Boolean) {
-    val markets = event.markets.filter { it.name == "totals" }
+    val markets = marketRepository.findByEventId(event.id).filter { it.name == "totals" }
     if (markets.isEmpty()) {
       logger.info("No totals market found for event ${event.id}")
       return

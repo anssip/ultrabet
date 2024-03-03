@@ -115,10 +115,10 @@ data class Event(
   @JoinColumn(name = "sport")
   val sport: Sport,
 
-  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
   val markets: List<Market> = emptyList(),
 
-  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
   val scoreUpdates: MutableList<ScoreUpdate> = mutableListOf(),
 
   @Enumerated(EnumType.STRING)

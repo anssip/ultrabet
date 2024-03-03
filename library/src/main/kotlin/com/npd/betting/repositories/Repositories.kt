@@ -29,16 +29,20 @@ interface BetRepository : JpaRepository<Bet, Int> {
   fun updateAllWinning()
 
   @Modifying
-  @Query("UPDATE Bet b SET b.status = com.npd.betting.model.BetStatus.LOST WHERE b.status = com.npd.betting.model.BetStatus.PENDING " +
-    "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.PENDING) " +
-    "AND 0 < (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.LOST)")
+  @Query(
+    "UPDATE Bet b SET b.status = com.npd.betting.model.BetStatus.LOST WHERE b.status = com.npd.betting.model.BetStatus.PENDING " +
+      "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.PENDING) " +
+      "AND 0 < (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status = com.npd.betting.model.BetStatus.LOST)"
+  )
   fun updateAllLosing()
 
   @Query("SELECT b FROM Bet b WHERE b.status = com.npd.betting.model.BetStatus.PENDING AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)")
   fun findAllWinning(marketOptionId: Int): List<Bet>
 
-  @Query("SELECT b FROM Bet b WHERE b.status = :currentStatus " +
-    "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)")
+  @Query(
+    "SELECT b FROM Bet b WHERE b.status = :currentStatus " +
+      "AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)"
+  )
   fun findBetsWithWinningOptions(currentStatus: BetStatus): List<Bet>
 }
 
@@ -90,6 +94,9 @@ interface ScoreUpdateRepository : JpaRepository<ScoreUpdate, Int> {
 interface SportRepository : JpaRepository<Sport, Int> {
   fun findByKey(key: String): Sport?
 
+  @Query("SELECT s FROM Sport s JOIN FETCH s.events e WHERE e.completed = false AND s.active = true")
   fun findByActiveTrue(): List<Sport>
+
+  @Query("SELECT s FROM Sport s JOIN FETCH s.events e WHERE e.completed = false AND s.group = :group AND s.active = true")
   fun findByGroupAndActiveTrue(group: String): List<Sport>
 }
