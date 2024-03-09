@@ -29,8 +29,7 @@ class ResultService(
       eventRepository.findById(eventId).getOrNull()
         ?: throw Error("Cannot find event with id $eventId")
     saveEventResult(event)
-    val scoreUpdates = scoreUpdateRepository.findByEventId(event.id)
-    saveMatchTotalsResult(event, scoreUpdates, event.completed ?: false)
+    saveMatchTotalsResult(event, event.completed ?: false)
 
   }
 
@@ -41,8 +40,7 @@ class ResultService(
       saveH2HResult(event)
       saveSpreadsResult(event)
     }
-    val scoreUpdates = scoreUpdateRepository.findByEventId(event.id)
-    saveMatchTotalsResult(event, scoreUpdates, event.completed ?: false)
+    saveMatchTotalsResult(event, event.completed ?: false)
   }
 
   private fun saveSpreadsResult(event: Event) {
@@ -113,13 +111,13 @@ class ResultService(
   }
 
   @Transactional
-  fun saveMatchTotalsResult(event: Event, scores: List<ScoreUpdate>, isFinalResult: Boolean) {
+  fun saveMatchTotalsResult(event: Event, isFinalResult: Boolean) {
     val markets = marketRepository.findByEventId(event.id).filter { it.name == "totals" }
     if (markets.isEmpty()) {
       logger.info("No totals market found for event ${event.id}")
       return
     }
-    val totalScore = getTotalNumberOfScores(scores, event)
+    val totalScore = getTotalNumberOfScores(event)
 
     markets.forEach {
       val over = it.options.find { option -> option.name == "Over" }
@@ -138,9 +136,9 @@ class ResultService(
   }
 
   private fun getTotalNumberOfScores(
-    scores: List<ScoreUpdate>,
     event: Event
   ): Int {
+    val scores = scoreUpdateRepository.findByEventId(event.id)
     if (scores.isEmpty()) {
       logger.info("No scores found for event ${event.id}")
       return 0

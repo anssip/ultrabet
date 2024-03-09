@@ -1,6 +1,8 @@
 package com.npd.betting.model
 
 import jakarta.persistence.*
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.math.BigDecimal
 import java.sql.Timestamp
 
@@ -85,6 +87,19 @@ enum class EventResult {
 
 @Entity
 @Table(name = "events")
+@NamedEntityGraph(
+  name = "Event.withMarketsAndOptions",
+  attributeNodes = [
+    NamedAttributeNode("markets", subgraph = "Market.withOptions"),
+    NamedAttributeNode("sport")
+  ],
+  subgraphs = [
+    NamedSubgraph(
+      name = "Market.withOptions",
+      attributeNodes = [NamedAttributeNode("options")]
+    )
+  ]
+)
 data class Event(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -111,20 +126,32 @@ data class Event(
   @Column(name = "start_time", nullable = false)
   val startTime: Timestamp,
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "sport")
   val sport: Sport,
 
-  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
+  @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
   val markets: List<Market> = emptyList(),
 
   @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
-  val scoreUpdates: MutableList<ScoreUpdate> = mutableListOf(),
+  val scoreUpdates: MutableSet<ScoreUpdate> = mutableSetOf(),
 
   @Enumerated(EnumType.STRING)
   @Column(name = "result")
   var result: EventResult? = null
-)
+) {
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as Event
+    return id == other.id
+  }
+
+}
 
 @Entity
 @Table(name = "sports")
@@ -151,9 +178,20 @@ data class Sport(
   @Column(name = "has_outrights", nullable = false)
   val hasOutrights: Boolean,
 
-  @OneToMany(mappedBy = "sport")
-  val events: List<Event> = emptyList()
-)
+  @OneToMany(mappedBy = "sport", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+  @Fetch(FetchMode.SUBSELECT)
+  val events: Set<Event> = emptySet()
+) {
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as Sport
+    return id == other.id
+  }
+}
 
 @Entity
 @Table(name = "markets")
@@ -174,12 +212,12 @@ data class Market(
   @Column(name = "source", nullable = false)
   val source: String,
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id")
   val event: Event,
 
-  @OneToMany(mappedBy = "market", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-  val options: List<MarketOption> = emptyList()
+  @OneToMany(mappedBy = "market", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+  val options: Set<MarketOption> = emptySet()
 )
 
 @Entity
@@ -204,13 +242,24 @@ data class MarketOption(
   @Column(name = "description")
   var description: String? = null,
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "market_id")
   val market: Market,
 
   @OneToMany(mappedBy = "marketOption", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
   val betOptions: MutableList<BetOption> = mutableListOf()
-)
+) {
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as MarketOption
+    return id == other.id
+  }
+}
 
 @Entity
 @Table(name = "score_updates")
@@ -259,7 +308,7 @@ data class Bet(
   @Column(name = "created_at", nullable = false)
   var createdAt: Timestamp,
 
-) {
+  ) {
   constructor(user: User, stake: BigDecimal, status: BetStatus) : this(
     user,
     stake,

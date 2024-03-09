@@ -28,11 +28,6 @@ class SportController @Autowired constructor(
     return sportRepository.findByGroupAndActiveTrue(group)
   }
 
-  @SchemaMapping(typeName = "Sport", field = "events")
-  fun getSportEvents(sport: Sport): List<Event> {
-    return eventRepository.findBySportIdAndCompletedFalse(sport.id)
-  }
-
   @SchemaMapping(typeName = "Sport", field = "activeEventCount")
   fun activeEventCount(sport: Sport): Int {
     return eventRepository.countBySportIdAndCompleted(sport.id, false)

@@ -2,11 +2,13 @@ package com.npd.betting.repositories
 
 import com.npd.betting.model.*
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 
 // default methods in JPA repiositories
@@ -47,11 +49,11 @@ interface BetRepository : JpaRepository<Bet, Int> {
 }
 
 @Repository
+@Transactional
 interface EventRepository : JpaRepository<Event, Int> {
   fun findByIsLiveTrueAndCompletedFalse(): List<Event>
   fun findByIsLiveFalseAndCompletedFalse(): List<Event>
 
-  fun findByCompletedFalse(): List<Event>
 
   fun findByExternalId(externalId: String): Event?
 
@@ -59,8 +61,13 @@ interface EventRepository : JpaRepository<Event, Int> {
 
   fun countBySportIdAndCompleted(sportId: Int, completed: Boolean): Int
 
-  @Query("SELECT e FROM Event e WHERE e.sport.group = :group AND e.completed = false")
-  fun findBySportGroupAndCompletedFalse(group: String): List<Event>
+  @EntityGraph(value = "Event.withMarketsAndOptions", type = EntityGraph.EntityGraphType.LOAD, attributePaths = ["markets", "markets.options"])
+  fun findByCompletedFalse(): List<Event>
+
+  @EntityGraph(value = "Event.withMarketsAndOptions", type = EntityGraph.EntityGraphType.LOAD, attributePaths = ["markets", "markets.options"])
+  fun findBySportGroupAndCompletedFalse(@Param("group") group: String): List<Event>
+
+
 }
 
 
@@ -94,7 +101,9 @@ interface ScoreUpdateRepository : JpaRepository<ScoreUpdate, Int> {
 interface SportRepository : JpaRepository<Sport, Int> {
   fun findByKey(key: String): Sport?
 
+  @Query("SELECT s FROM Sport s JOIN FETCH s.events e LEFT JOIN FETCH e.scoreUpdates su JOIN FETCH e.markets m JOIN FETCH m.options o WHERE e.completed = false")
   fun findByActiveTrue(): List<Sport>
 
+  @Query("SELECT s FROM Sport s JOIN FETCH s.events e JOIN FETCH e.markets m JOIN FETCH m.options o LEFT JOIN FETCH e.scoreUpdates su WHERE e.completed = false AND s.group = :group")
   fun findByGroupAndActiveTrue(group: String): List<Sport>
 }

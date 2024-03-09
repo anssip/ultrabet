@@ -3,7 +3,6 @@ package com.npd.betting.controllers
 import com.npd.betting.model.Event
 import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
-import com.npd.betting.model.Sport
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.repositories.SportRepository
 import com.npd.betting.services.ResultService
@@ -38,8 +37,14 @@ class EventController @Autowired constructor(
     return eventRepository.findByIsLiveFalseAndCompletedFalse()
   }
 
+  @SchemaMapping(typeName = "Query", field = "listAllEvents")
+  fun listAllEvents(): List<Event> {
+    return eventRepository.findByCompletedFalse()
+  }
+
   @SchemaMapping(typeName = "Query", field = "eventsBySportGroup")
   fun eventsBySportGroup(@Argument group: String): List<Event> {
+    if (group == "all") return eventRepository.findByCompletedFalse()
     return eventRepository.findBySportGroupAndCompletedFalse(group)
   }
 
@@ -48,35 +53,15 @@ class EventController @Autowired constructor(
     return eventRepository.findByIsLiveTrueAndCompletedFalse()
   }
 
-  @SchemaMapping(typeName = "Query", field = "listAllEvents")
-  fun listAllEvents(): List<Event> {
-    return eventRepository.findByCompletedFalse()
-  }
-
-  @SchemaMapping(typeName = "Event", field = "markets")
-  fun getEventMarkets(event: Event, @Argument("source") source: String?): List<Market> {
-    val sourceClause = if (source != null) "AND m.source = :source" else ""
-    val query = entityManager.createQuery(
-      "SELECT e FROM Event e JOIN FETCH e.markets m WHERE e.id = :id $sourceClause", Event::class.java
-    )
-    query.setParameter("id", event.id)
-    if (source != null) {
-      query.setParameter("source", source)
-    }
-    val resultList = query.resultList
-    return if (resultList.isEmpty()) emptyList() else resultList[0].markets
-  }
-
-  @SchemaMapping(typeName = "Event", field = "scoreUpdates")
-  fun getEventScoreUpdates(event: Event): List<ScoreUpdate> {
-    val query = entityManager.createQuery(
-      "SELECT e FROM Event e JOIN FETCH e.scoreUpdates s WHERE e.id = :id", Event::class.java
-    )
-    query.setParameter("id", event.id)
-    val resultList = query.resultList
-    return if (resultList.isEmpty()) emptyList() else resultList[0].scoreUpdates
-
-  }
+//  @SchemaMapping(typeName = "Event", field = "scoreUpdates")
+//  fun getEventScoreUpdates(event: Event): List<ScoreUpdate> {
+//    val query = entityManager.createQuery(
+//      "SELECT e FROM Event e JOIN FETCH e.scoreUpdates s WHERE e.id = :id", Event::class.java
+//    )
+//    query.setParameter("id", event.id)
+//    val resultList = query.resultList
+//    return if (resultList.isEmpty()) emptyList() else resultList[0].scoreUpdates
+//  }
 
   @MutationMapping
   fun createEvent(

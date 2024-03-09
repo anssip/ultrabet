@@ -215,9 +215,9 @@ class EventService(
           if (existingScores.find { it.name == scoreData.name && it.score == scoreData.score } == null) {
             // we don't have this score yet, create it
             logger.info("Event ${event.id}, has new score ${scoreData.name} ${scoreData.score}")
-            event.scoreUpdates.add(score)
-            val saved: Event = eventRepository.save(event)
-            scoreUpdatesSink.emit(saved)
+            scoreUpdateRepository.save(score)
+            val updated = eventRepository.findById(event.id).get()
+            scoreUpdatesSink.emit(updated)
           } else {
             logger.debug("Score ${scoreData.name} ${scoreData.score} already exists, skipping...")
           }
@@ -226,8 +226,8 @@ class EventService(
           scoreUpdateRepository.save(score)
         }
       }
-      val update = eventRepository.findById(event.id).get()
-      resultService.saveMatchTotalsResult(update, update.scoreUpdates, false)
+      val updated = eventRepository.findById(event.id).get()
+      resultService.saveMatchTotalsResult(updated, false)
     }
   }
 

@@ -39,16 +39,6 @@ class MarketController @Autowired constructor(
     return marketRepository.findByEventIdAndIsLiveTrue(eventId)
   }
 
-  @SchemaMapping(typeName = "Market", field = "options")
-  fun getMarketOptions(market: Market): List<MarketOption> {
-    val query = entityManager.createQuery(
-      "SELECT m FROM Market m JOIN FETCH m.options WHERE m.id = :id", Market::class.java
-    )
-    query.setParameter("id", market.id)
-    val resultList = query.resultList
-    return if (resultList.isEmpty()) emptyList() else resultList[0].options
-  }
-
   @MutationMapping
   fun createMarket(@Argument name: String, @Argument eventId: Int): Market {
     val event = eventRepository.findById(eventId).orElse(null)
