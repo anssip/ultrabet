@@ -4,7 +4,10 @@ import com.npd.betting.model.Bet
 import com.npd.betting.model.BetOption
 import com.npd.betting.model.BetStatus
 import com.npd.betting.repositories.*
+import com.npd.betting.services.EventService
 import com.npd.betting.services.UserService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.graphql.data.method.annotation.Argument
@@ -32,6 +35,7 @@ open class BetController @Autowired constructor(
   private val walletRepository: WalletRepository,
   private val userService: UserService
 ) {
+  val logger: Logger = LoggerFactory.getLogger(BetController::class.java)
 
   @SchemaMapping(typeName = "Query", field = "getBet")
   fun getBet(@Argument id: Int): Bet? {
@@ -41,7 +45,8 @@ open class BetController @Autowired constructor(
   @SchemaMapping(typeName = "Query", field = "listBets")
   fun listBets(): List<Bet> {
     val user = userService.findAuthenticatedUser()
-    return betRepository.findByUserIdOrderByCreatedAtDesc(user.id, PageRequest.of(0, 10))
+    logger.debug("Fetching bets for user ${user.id}")
+    return betRepository.findByUserIdOrderByCreatedAtDesc(user)
   }
 
   @SchemaMapping(typeName = "Bet", field = "potentialWinnings")

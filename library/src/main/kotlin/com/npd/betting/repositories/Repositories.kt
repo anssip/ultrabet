@@ -24,7 +24,19 @@ interface WalletRepository : JpaRepository<Wallet, Int> {
 }
 
 interface BetRepository : JpaRepository<Bet, Int> {
-  fun findByUserIdOrderByCreatedAtDesc(userId: Int, pageable: Pageable): List<Bet>
+  @Query(
+    "SELECT b FROM Bet b "
+      + "JOIN FETCH b.betOptions bo "
+      + "JOIN FETCH bo.marketOption mo "
+      + "JOIN FETCH mo.market m "
+      + "JOIN FETCH m.event e "
+      + "JOIN FETCH e.markets em "
+      + "JOIN FETCH em.options "
+      + "LEFT JOIN FETCH e.scoreUpdates "
+      + "JOIN FETCH e.sport "
+      + "WHERE b.user = :user ORDER BY b.createdAt DESC"
+  )
+  fun findByUserIdOrderByCreatedAtDesc(user: User): List<Bet>
 
   @Modifying
   @Query("UPDATE Bet b SET b.status = com.npd.betting.model.BetStatus.WON WHERE b.status = com.npd.betting.model.BetStatus.PENDING AND 0 = (SELECT COUNT(bo) FROM BetOption bo WHERE bo.bet.id = b.id AND bo.status != com.npd.betting.model.BetStatus.WON)")

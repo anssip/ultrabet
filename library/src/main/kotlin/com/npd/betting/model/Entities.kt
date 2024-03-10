@@ -27,7 +27,17 @@ data class User(
 
   @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
   val bets: List<Bet> = emptyList()
-)
+) {
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as User
+    return id == other.id
+  }
+}
 
 @Entity
 @Table(name = "wallets")
@@ -45,7 +55,17 @@ data class Wallet(
 
   @OneToMany(mappedBy = "wallet", cascade = [CascadeType.ALL])
   val transactions: List<Transaction> = emptyList()
-)
+) {
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as Wallet
+    return id == other.id
+  }
+}
 
 @Entity
 @Table(name = "transactions")
@@ -185,6 +205,7 @@ data class Sport(
   override fun hashCode(): Int {
     return id.hashCode()
   }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -297,8 +318,9 @@ data class Bet(
   @Enumerated(EnumType.STRING)
   var status: BetStatus,
 
-  @OneToMany(mappedBy = "bet", cascade = [CascadeType.PERSIST], fetch = FetchType.EAGER)
-  var betOptions: MutableList<BetOption> = mutableListOf(),
+  @OneToMany(mappedBy = "bet", cascade = [CascadeType.PERSIST], fetch = FetchType.LAZY)
+  @Fetch(FetchMode.SUBSELECT)
+  var betOptions: MutableSet<BetOption> = mutableSetOf(),
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -313,7 +335,7 @@ data class Bet(
     user,
     stake,
     status,
-    mutableListOf(),
+    mutableSetOf(),
     null,
     Timestamp(System.currentTimeMillis())
   )
@@ -333,6 +355,17 @@ data class Bet(
   fun getId(): Int {
     return id ?: 0
   }
+
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as Bet
+    return id == other.id
+  }
 }
 
 @Entity
@@ -342,8 +375,9 @@ data class BetOption(
   @JoinColumn(name = "bet_id")
   val bet: Bet,
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "market_option_id")
+//  @Fetch(FetchMode.JOIN)
   val marketOption: MarketOption,
 
   @Id
@@ -353,7 +387,17 @@ data class BetOption(
   @Enumerated(EnumType.STRING)
   @Column(name = "status")
   var status: BetStatus? = BetStatus.PENDING,
-)
+) {
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as BetOption
+    return id == other.id
+  }
+}
 
 
 enum class BetStatus {
