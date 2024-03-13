@@ -35,7 +35,7 @@ class ResultService(
 
   @Transactional
   fun saveEventResult(event: Event) {
-    logger.info("Updating result for event ${event.id}")
+    logger.info("saveEventResult(): Updating result for event ${event.id}. Event Completed ? ${event.completed}")
     if (event.completed == true) {
       saveH2HResult(event)
       saveSpreadsResult(event)

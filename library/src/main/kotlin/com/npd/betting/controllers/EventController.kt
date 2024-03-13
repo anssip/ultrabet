@@ -5,8 +5,11 @@ import com.npd.betting.model.Market
 import com.npd.betting.model.ScoreUpdate
 import com.npd.betting.repositories.EventRepository
 import com.npd.betting.repositories.SportRepository
+import com.npd.betting.services.EventService
 import com.npd.betting.services.ResultService
 import jakarta.persistence.EntityManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
@@ -26,6 +29,7 @@ class EventController @Autowired constructor(
   private val scoreUpdatesSink: AccumulatingSink<Event>,
   private val eventStatusUpdatesSink: AccumulatingSink<Event>
 ) {
+  val logger: Logger = LoggerFactory.getLogger(EventController::class.java)
 
   @SchemaMapping(typeName = "Query", field = "getEvent")
   fun getEvent(@Argument id: Int): Event? {
@@ -71,6 +75,7 @@ class EventController @Autowired constructor(
     @Argument startTime: String,
     @Argument sport: String
   ): Event {
+
     val sportEntity = sportRepository.findByKey(sport) ?: throw Exception("Sport with key $sport does not exist")
     val event = Event(
       homeTeamName = homeTeamName,
@@ -87,6 +92,7 @@ class EventController @Autowired constructor(
 
   @SchemaMapping(typeName = "Mutation", field = "updateResult")
   fun updateResult(@Argument("eventId") eventId: Int) {
+    logger.info("Updating result for event $eventId")
     resultService.updateResult(eventId)
   }
 
