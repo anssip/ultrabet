@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import org.hibernate.Hibernate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -156,6 +157,9 @@ class EventService(
   ) {
     existingMarket.isLive = event.isLive
     existingMarket.lastUpdated = Timestamp(marketData.last_update * 1000)
+
+    // Initialize the options field
+    Hibernate.initialize(existingMarket.options)
 
     marketData.outcomes.forEach { marketOptionData ->
       val existingMarketOption = existingMarket.options.find { it.name == marketOptionData.name }
